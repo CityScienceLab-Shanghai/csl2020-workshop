@@ -1,20 +1,33 @@
 <template>
-  <div class="visualization">
-      <span> {{ simData }} </span>
-  </div>
+    <div class="visualization">
+        <h1>Simulation result:</h1>
+        <span></span>
+    </div>
 </template>
 
 <script>
+import * as d3 from 'd3';
 
 export default {
-  name: 'Visualization',
-  props: {
-    simData: Object
-  },
-  data: function () {
-    return {}
-  },
-  methods: {}
+    name: 'Visualization',
+    props: {
+        simData: Object
+    },
+    data: function () {
+        return {};
+    },
+    methods: {
+        draw() {
+            d3.selectAll("span")
+            .text(this.simData.data);
+        }
+    },
+    watch: {
+        simData (newData) {
+            this.simData = newData;
+            this.draw();
+        }
+    }
 }
 </script>
 
