@@ -1,14 +1,21 @@
 <template>
     <div class="control-panel">
-        <button
+        <PanelPane
+            :name="'Agent preferences'"
+            :description="'Settings like preference for moving, commute distance, and house prices.'"
+        ></PanelPane>
+        
+        <b-button
+            class="md-raised md-primary"
             :disabled="running"
             @click="runSimulation"
-        >{{ running ? "Running...": "Run Simulation" }}</button>
+        >{{ running ? "Running...": "Run Simulation" }}</b-button>
     </div>
 </template>
 
 <script>
 import axios from "axios";
+import PanelPane from './PanelPane.vue';
 
 export default {
     name: "ControlPanel",
@@ -16,6 +23,9 @@ export default {
         simulationApi: String,
         statusApi: String,
         resultsApi: String,
+    },
+    components: {
+        PanelPane,
     },
     data: function () {
         return {
@@ -56,26 +66,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-button {
-    padding: 1em;
-    padding-left: 1.5em;
-    padding-right: 1.5em;
-    border-radius: 0.3em;
-
-    font-size: 1.2em;
-    background: rgb(7, 190, 166);
-    color: white;
-
-    cursor: pointer;
-
-    transition: width 0.5s ease-in-out;
-}
-
-button:active {
-    background: rgb(14, 113, 126);
-}
-
-button:disabled {
-    background: rgb(134, 201, 192);
-}
 </style>
