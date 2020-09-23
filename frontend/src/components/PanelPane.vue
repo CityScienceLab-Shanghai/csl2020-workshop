@@ -5,10 +5,11 @@
         class="mb-2"
     >
             <Slider
-                v-for="element in elements"
-                :key="element.id"
-                :id="element.id"
-                :name="element.name"
+                v-for="control in controls"
+                :key="control.id"
+                :id="control.id"
+                :name="control.name"
+                :description="control.description"
                 @slider-change="dataUpdated"
             ></Slider>
     </b-card>
@@ -22,19 +23,27 @@ export default {
     props: {
         name: String,
         description: String,
-        elements: Array,
+        controls: Array,
     },
     components: {
         Slider
     },
     data: function () {
-        return {};
+        return {
+            parameters: {}
+        };
     },
     methods: {
-        dataUpdated (element, data) {
-            console.log(element, data);
+        dataUpdated (id, data) {
+            this.parameters[id] = data;
+            this.$emit('data-update', this.parameters);
         }
     },
+    mounted () {
+        for (var control of this.controls) {
+            this.parameters[control.id] = 0;
+        }
+    }
 };
 </script>
 

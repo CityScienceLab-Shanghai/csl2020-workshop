@@ -1,8 +1,12 @@
 <template>
     <div class="control-panel">
         <PanelPane
-            :name="'Agent preferences'"
-            :description="'Settings like preference for moving, commute distance, and house prices.'"
+            v-for="panel in panels"
+            :key="panel.name"
+            :name="panel.name"
+            :description="panel.description"
+            :controls="panel.controls"
+            @data-update='updateParameters'
         ></PanelPane>
         
         <b-button
@@ -20,9 +24,10 @@ import PanelPane from './PanelPane.vue';
 export default {
     name: "ControlPanel",
     props: {
-        simulationApi: String,
+        simulateApi: String,
         statusApi: String,
         resultsApi: String,
+        panels: Array
     },
     components: {
         PanelPane,
@@ -30,14 +35,23 @@ export default {
     data: function () {
         return {
             running: false, // Whether the simulation is currently running
+            parameters: {}
         };
     },
     methods: {
+        // Update current parameters
+        updateParameters(data) {
+            for (var key of Object.keys(data)) {
+                this.parameters[key] = Number(data[key]);
+            }
+        },
+
         // Send params to GAMA and start simulation
         runSimulation() {
             console.log("Running simulation");
+            console.log(this.parameters);
 
-            axios.get("").then(() => {
+            axios.post(this.simulateApi, this.parameters).then(() => {
                 this.running = true;
                 this.startHeartBeat();
             });
@@ -46,7 +60,7 @@ export default {
         // Start a heartbeat checking for completion once per second
         startHeartBeat() {
             var heartbeat = setInterval(() => {
-                axios.get("").then(() => {
+                axios.get(this.statusApi).then(() => {
                     this.running = false;
                     clearInterval(heartbeat);
                     this.getResults();
@@ -56,11 +70,18 @@ export default {
 
         // Get simulation results and publish an event to update all data
         getResults() {
-            axios.get("").then((response) => {
+            axios.get(this.resultsApi).then((response) => {
                 this.$emit("simulation-update", response);
             });
         },
     },
+    mounted () {
+        for (var panel of this.panels) {
+            for (var control of panel.controls) {
+                this.parameters[control.id] = 0;
+            }
+        }
+    }
 };
 </script>
 
