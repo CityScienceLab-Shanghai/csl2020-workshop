@@ -19,11 +19,12 @@ export default {
     props: {
         id: String,
         name: String,
-        description: String
+        description: String,
+        default: Number
     },
     data: function () {
         return {
-            value: 0
+            value: this.default
         };
     },
     watch: {

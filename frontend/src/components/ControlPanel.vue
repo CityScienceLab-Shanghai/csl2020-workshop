@@ -6,7 +6,9 @@
             :name="panel.name"
             :description="panel.description"
             :controls="panel.controls"
-            @data-update='updateParameters'
+            :visible="currentPanel === panel.name"
+            @data-update="updateParameters"
+            @mouse-entered="currentPanel = panel.name"
         ></PanelPane>
         
         <b-button
@@ -35,6 +37,7 @@ export default {
     data: function () {
         return {
             running: false, // Whether the simulation is currently running
+            currentPanel: this.panels[0].name, // Current focused panel. Only show one panel at a time.
             parameters: {}
         };
     },

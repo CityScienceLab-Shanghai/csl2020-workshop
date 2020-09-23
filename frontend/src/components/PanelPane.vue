@@ -1,17 +1,23 @@
 <template>
     <b-card
+        class="mb-2"
         :title="name"
         :sub-title="description"
-        class="mb-2"
+        @mouseenter="$emit('mouse-entered')"
     >
+        <b-collapse
+            :visible="visible"
+        >
             <Slider
                 v-for="control in controls"
                 :key="control.id"
                 :id="control.id"
                 :name="control.name"
                 :description="control.description"
+                :default="control.default"
                 @slider-change="dataUpdated"
             ></Slider>
+        </b-collapse>
     </b-card>
 </template>
 
@@ -24,6 +30,7 @@ export default {
         name: String,
         description: String,
         controls: Array,
+        visible: Boolean
     },
     components: {
         Slider
