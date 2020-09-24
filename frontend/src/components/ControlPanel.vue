@@ -54,7 +54,7 @@ export default {
             console.log("Running simulation");
             console.log(this.parameters);
 
-            axios.post(this.simulateApi, this.parameters).then(() => {
+            axios.get(this.simulateApi, this.parameters).then(() => {
                 this.running = true;
                 this.startHeartBeat();
             });
@@ -81,7 +81,7 @@ export default {
     mounted () {
         for (var panel of this.panels) {
             for (var control of panel.controls) {
-                this.parameters[control.id] = 0;
+                this.parameters[control.id] = control.default;
             }
         }
     }

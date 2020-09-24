@@ -48,7 +48,7 @@ export default {
     },
     mounted () {
         for (var control of this.controls) {
-            this.parameters[control.id] = 0;
+            this.parameters[control.id] = control.default;
         }
     }
 };
