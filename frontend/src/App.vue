@@ -2,9 +2,9 @@
   <div id="app">
     <b-container fluid>
       <b-row>
-        <b-col>
+        <b-col cols="2">
           <ControlPanel 
-          :panels="panels"
+          :panels="controlPanels"
           :simulateApi="simulateApi"
           :statusApi="statusApi"
           :resultsApi="resultsApi"
@@ -13,7 +13,11 @@
         <b-col cols="7">
           <Visualization :sim-data="simulationData" />
         </b-col>
-        <b-col></b-col>
+        <b-col cols="3">
+          <OutputPanel 
+            :panels="outputPanels"
+          />
+        </b-col>
       </b-row>
     </b-container>
   </div>
@@ -31,6 +35,7 @@ import "bootstrap-vue/dist/bootstrap-vue.css";
 
 import ControlPanel from "./components/ControlPanel.vue";
 import Visualization from "./components/Visualization.vue";
+import OutputPanel from "./components/OutputPanel.vue";
 
 import Config from "./Config.js"
 
@@ -39,13 +44,15 @@ export default {
   components: {
     ControlPanel,
     Visualization,
+    OutputPanel
   },
   data: function () {
     return {
       simulateApi: Config.simulateApi,
       statusApi: Config.statusApi,
       resultsApi: Config.resultsApi,
-      panels: Config.panels,
+      controlPanels: Config.controlPanels,
+      outputPanels: Config.outputPanels,
       simulationData: {},
     };
   },

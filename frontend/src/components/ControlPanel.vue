@@ -6,6 +6,7 @@
             :name="panel.name"
             :description="panel.description"
             :controls="panel.controls"
+            :charts="panel.charts"
             :visible="currentPanel === panel.name"
             @data-update="updateParameters"
             @mouse-entered="currentPanel = panel.name"

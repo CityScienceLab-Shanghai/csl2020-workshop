@@ -17,12 +17,20 @@
                 :default="control.default"
                 @slider-change="dataUpdated"
             ></Slider>
+
+            <Chart
+                v-for="chart in charts"
+                :key="chart.id"
+                :type="chart.type"
+                :chart-data="chart.data"
+            ></Chart>
         </b-collapse>
     </b-card>
 </template>
 
 <script>
 import Slider from './Slider.vue'
+import Chart from './Chart.vue'
 
 export default {
     name: "PanelPane",
@@ -30,10 +38,11 @@ export default {
         name: String,
         description: String,
         controls: Array,
+        charts: Array,
         visible: Boolean
     },
     components: {
-        Slider
+        Slider, Chart
     },
     data: function () {
         return {

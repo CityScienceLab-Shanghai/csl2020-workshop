@@ -1,8 +1,16 @@
+var tinycolor = require("tinycolor2");
+
+function getThemeColor(color, opacity) {
+    var colorString = getComputedStyle(document.body).getPropertyValue('--' + color);
+    var colorData = tinycolor(colorString).setAlpha(opacity);
+    return colorData.toRgbString();
+}
+
 export default {
     simulateApi: "",
     statusApi: "",
     resultsApi: "",
-    panels: [
+    controlPanels: [
         {
             name: "Low-income residents",
             description: "Describes the preferences of low-income residents, like moving, commute distance, and house prices.",
@@ -38,6 +46,7 @@ export default {
                     default: -0.21
                 },
             ],
+            charts: []
         },
         {
             name: "High-income residents",
@@ -73,6 +82,72 @@ export default {
                     name: "Low income disparity",
                     default: -0.52
                 },
+            ],
+            charts: []
+        },
+    ],
+
+    outputPanels: [
+        {
+            name: "Overall assessment",
+            description: "Assessment of the diversity, equality, and environment of the neighborhood.",
+            controls: [],
+            charts: [
+                {
+                    id: "overall",
+                    type: "radar",
+                    data: {
+                        labels: ['Density', 'Diversity', 'Equality', 'Environment'],
+                        datasets: [
+                            { 
+                                label: 'Baseline', 
+                                data: [15, 25, 10, 5],
+                                borderColor: getThemeColor('gray', 0.5),
+                                backgroundColor: getThemeColor('gray', 0.2) 
+                            },
+                            { 
+                                label: 'Current', 
+                                data: [80, 15, 50, 30],
+                                borderColor: getThemeColor('blue', 0.5),
+                                backgroundColor: getThemeColor('blue', 0.2)
+                            },
+                        ]
+                    }
+                },
+                {
+                    id: "running-history",
+                    type: "line",
+                    data: {
+                        labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                        datasets: [
+                            { 
+                                label: 'Density', 
+                                data: [20, 25, 15, 5, 15, 30, 20, 10, 5, 15, 10, 15],
+                                fill: false,
+                                borderColor: getThemeColor('blue', 0.5)
+                            },
+                            { 
+                                label: 'Diversity', 
+                                data: [15, 30, 20, 10, 5, 15, 10, 15, 10, 10, 25, 20],
+                                fill: false,
+                                borderColor: getThemeColor('cyan', 0.5)
+                            },
+                            { 
+                                label: 'Equality', 
+                                data: [5, 15, 10, 15, 10, 10, 25, 20, 20, 25, 15, 5],
+                                fill: false,
+                                borderColor: getThemeColor('green', 0.5)
+                            },
+                            { 
+                                label: 'Environment', 
+                                data: [10, 10, 25, 20, 20, 25, 15, 5, 5, 15, 10, 15],
+                                fill: false,
+                                borderColor: getThemeColor('yellow', 0.5)
+                            }
+                        ]
+                    }
+
+                }
             ],
         },
     ]
