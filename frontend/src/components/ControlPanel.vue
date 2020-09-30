@@ -75,7 +75,8 @@ export default {
         // Get simulation results and publish an event to update all data
         getResults() {
             axios.get(this.resultsApi).then((response) => {
-                this.$emit("simulation-update", response);
+                console.log(response);
+                this.$emit("simulation-update", response.data);
             });
         },
     },

@@ -9,7 +9,7 @@ function getThemeColor(color, opacity) {
 export default {
     simulateApi: "",
     statusApi: "",
-    resultsApi: "",
+    resultsApi: "http://ec2-18-163-189-148.ap-east-1.compute.amazonaws.com:5000/result",
     controlPanels: [
         {
             name: "Low-income residents",
@@ -97,13 +97,19 @@ export default {
                     id: "overall",
                     type: "radar",
                     data: {
-                        labels: ['Density', 'Diversity', 'Equality', 'Environment'],
+                        labels: ['Affordability', 'Diversity', ['Building', 'Energy', 'Consumption'], ['Commute', 'Energy', 'Consumption']],
                         datasets: [
                             { 
                                 label: 'Baseline', 
                                 data: [15, 25, 10, 5],
                                 borderColor: getThemeColor('gray', 0.5),
                                 backgroundColor: getThemeColor('gray', 0.2) 
+                            },
+                            { 
+                                label: 'Goal', 
+                                data: [100, 100, 100, 100],
+                                borderColor: getThemeColor('green', 0.5),
+                                backgroundColor: getThemeColor('green', 0.2)
                             },
                             { 
                                 label: 'Current', 
@@ -121,7 +127,7 @@ export default {
                         labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
                         datasets: [
                             { 
-                                label: 'Density', 
+                                label: 'Affordability', 
                                 data: [20, 25, 15, 5, 15, 30, 20, 10, 5, 15, 10, 15],
                                 fill: false,
                                 borderColor: getThemeColor('blue', 0.5)
@@ -133,13 +139,13 @@ export default {
                                 borderColor: getThemeColor('cyan', 0.5)
                             },
                             { 
-                                label: 'Equality', 
+                                label: 'Building Energy Consumption', 
                                 data: [5, 15, 10, 15, 10, 10, 25, 20, 20, 25, 15, 5],
                                 fill: false,
                                 borderColor: getThemeColor('green', 0.5)
                             },
                             { 
-                                label: 'Environment', 
+                                label: 'Commute Energy Consumption', 
                                 data: [10, 10, 25, 20, 20, 25, 15, 5, 5, 15, 10, 15],
                                 fill: false,
                                 borderColor: getThemeColor('yellow', 0.5)

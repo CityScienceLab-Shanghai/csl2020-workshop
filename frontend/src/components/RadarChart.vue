@@ -18,6 +18,11 @@ export default {
                         suggestedMax: 100,
                         maxTicksLimit: 7
                     },
+                },
+                legend: {
+                    labels: {
+                        boxWidth: 30
+                    }
                 }
             }
         };

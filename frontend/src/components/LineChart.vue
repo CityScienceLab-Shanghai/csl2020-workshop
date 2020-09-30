@@ -10,7 +10,12 @@ export default {
         return {
             options: {
                 ...defaults,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                legend: {
+                    labels: {
+                        boxWidth: 30
+                    }
+                }
             }
         };
     },
