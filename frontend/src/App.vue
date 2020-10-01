@@ -1,5 +1,9 @@
 <template>
     <div id="app">
+        <Visualization 
+            :sim-data="agentsData"
+            :step="currentStep" 
+            @agents-update="updateAgentsData($event)"/>
         <b-container fluid>
             <b-row>
                 <b-col cols="2">
@@ -11,9 +15,7 @@
                         @simulation-update="updateSimulationData($event)"
                     />
                 </b-col>
-                <b-col cols="7">
-                    <Visualization :sim-data="agentsData" />
-                </b-col>
+                <b-col cols="7"></b-col>
                 <b-col cols="3">
                     <OutputPanel :panels="outputPanels" />
                 </b-col>
@@ -54,7 +56,7 @@ function makeLineChartData (sourceData) {
     data.datasets[1].data = [];
 
     data.datasets[3].data = [];
-    for (var i = 1; i <= 12; i++) {
+    for (var i = 0; i < 12; i++) {
         data.datasets[0].data.push(
             Number.parseFloat(sourceData[i]['Low Income Proportion']) * 100
         );
@@ -84,17 +86,19 @@ export default {
             controlPanels: Config.controlPanels,
             outputPanels: Config.outputPanels,
             agentsData: {},
+            currentStep: 0
         };
     },
     methods: {
         updateSimulationData (data) {
-            console.log(data);
-            // this.agentsData = data;
-            // console.log(getThemeColor('gray', 0.5));
             this.outputPanels[0].charts[0].data = makeRadarChartData(data);
             this.outputPanels[0].charts[1].data = makeLineChartData(data);
+        },
+
+        updateAgentsData (data) {
+            this.agentsData = data;
         }
-    },
+    }
 };
 </script>
 
