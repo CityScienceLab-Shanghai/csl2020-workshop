@@ -64,10 +64,13 @@ export default {
         // Start a heartbeat checking for completion once per second
         startHeartBeat() {
             var heartbeat = setInterval(() => {
-                axios.get(this.statusApi).then(() => {
-                    this.running = false;
-                    clearInterval(heartbeat);
-                    this.getResults();
+                axios.get(this.statusApi).then((response) => {
+                    console.log(response);
+                    if (response.data === 'Terminated') {
+                        this.running = false;
+                        clearInterval(heartbeat);
+                        this.getResults();
+                    }
                 });
             }, 1000);
         },

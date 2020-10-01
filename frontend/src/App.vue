@@ -40,20 +40,30 @@ import Config from "./Config.js";
 function makeRadarChartData (sourceData) {
     var data = {...Config.outputPanels[0].charts[0].data}
     data.datasets[2].data = [
+        Number.parseFloat(sourceData[12]['Low Income Proportion']) * 100, 
+        Number.parseFloat(sourceData[12]['Diversity']) * 100, 
         10, 
-        Number.parseFloat(sourceData[12].Diversity) * 100, 
-        10, 
-        10
+        Number.parseFloat(sourceData[12]['All']) / 20
     ];
     return data;
 }
 
 function makeLineChartData (sourceData) {
     var data = {...Config.outputPanels[0].charts[1].data}
+    data.datasets[0].data = [];
     data.datasets[1].data = [];
+
+    data.datasets[3].data = [];
     for (var i = 1; i <= 12; i++) {
+        data.datasets[0].data.push(
+            Number.parseFloat(sourceData[i]['Low Income Proportion']) * 100
+        );
         data.datasets[1].data.push(
-            Number.parseFloat(sourceData[i].Diversity) * 100
+            Number.parseFloat(sourceData[i]['Diversity']) * 100
+        );
+
+        data.datasets[3].data.push(
+            Number.parseFloat(sourceData[i]['All']) / 20
         );
     }
     return data;
