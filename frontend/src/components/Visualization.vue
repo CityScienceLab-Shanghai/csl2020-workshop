@@ -237,15 +237,15 @@ export default {
 
         setInterval(() => {
             if (this.animate) {
-                this.currentTime = (this.currentTime + 1) % 24;
+                this.currentTime = (this.currentTime + 1) % (24 * 60);
                 this.$emit('time-update', this.currentTime);
-                if (this.currentTime === 7 || this.currentTime === 16) {
+                if (this.currentTime === 7 * 60 || this.currentTime === 16 * 60) {
                     this.currentMode = this.currentMode === 'home' ? 'work' : 'home';
                     this.updateDataset();
                     this.updateAgents();
                 }
             }
-        }, 2000);
+        }, 33);
     }
 }
 </script>

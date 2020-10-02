@@ -5,7 +5,7 @@
         :step="currentStep" 
         :animate="animate"
         @agents-update="updateAgentsData($event)"
-        @time-update="currentTime = Number.parseInt($event)"/>
+        @time-update="updateCurrentTime(Number.parseInt($event))"/>
         <b-container fluid>
             <b-row class="h-100">
                 <b-col cols="3">
@@ -26,7 +26,7 @@
                     <b-button size="lg" :variant="animate ? 'success' : 'danger'" @click="animate = !animate">
                         <b-icon-pause-fill v-if="animate"></b-icon-pause-fill>
                         <b-icon-play-fill v-if="!animate"></b-icon-play-fill>
-                        {{ currentTime }}:00
+                        {{ currentTime }}
                     </b-button>
                 </b-col>
                 <b-col cols="3">
@@ -123,7 +123,7 @@ export default {
             incentiveMode: 0,
             agentsData: {},
             currentStep: 0,
-            currentTime: 0,
+            currentTime: '00:00',
             animate: true,
         };
     },
@@ -139,6 +139,14 @@ export default {
 
         changeStep (_, value) {
             this.currentStep = Number.parseInt(value) - 1;
+        },
+
+        updateCurrentTime(time) {
+            var hours = Math.floor(time / 60);
+            var minutes = time % 60;
+            hours = hours < 10 ? '0' + hours : '' + hours;
+            minutes = minutes < 10 ? '0' + minutes : '' + minutes;
+            this.currentTime = hours + ':' + minutes;
         }
     }
 };

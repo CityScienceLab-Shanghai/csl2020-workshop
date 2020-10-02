@@ -67,11 +67,11 @@ export default {
             var heartbeat = setInterval(() => {
                 axios.get(this.statusApi).then((response) => {
                     console.log(response);
-                    if (response.data === 'Terminated') {
+                    // if (response.data === 'Terminated') {
                         this.running = false;
                         clearInterval(heartbeat);
                         this.getResults();
-                    }
+                    // }
                 });
             }, 1000);
         },
@@ -83,6 +83,16 @@ export default {
                 this.$emit("simulation-update", response.data);
             });
         },
+    },
+    watch: {
+        panels () {
+            this.parameters = {};
+            for (var panel of this.panels) {
+                for (var control of panel.controls) {
+                    this.parameters[control.id] = control.default;
+                }
+            }
+        }
     },
     mounted () {
         for (var panel of this.panels) {
