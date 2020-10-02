@@ -16,7 +16,8 @@
     "d3": "^6.1.1",
     "tinycolor2": "^1.4.1",
     "vue": "^2.6.12",
-    "vue-chartjs": "^3.5.1"
+    "vue-chartjs": "^3.5.1",
+    "vue-resize-directive": "^1.2.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

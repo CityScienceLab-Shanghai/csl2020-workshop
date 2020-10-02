@@ -10,6 +10,7 @@ export default {
         return {
             options: {
                 ...defaults,
+                responsive: true,
                 maintainAspectRatio: false,
                 legend: {
                     labels: {
@@ -26,7 +27,7 @@ export default {
 </script>
 
 <style scoped>
-canvas {
-    height: 15em;
+canvas#line-chart {
+    height: 15em !important;
 }
 </style>

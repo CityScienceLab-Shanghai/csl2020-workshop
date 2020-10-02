@@ -13,7 +13,8 @@
         ></PanelPane>
         
         <b-button
-            class="md-raised md-primary"
+            block
+            variant="primary"
             :disabled="running"
             @click="runSimulation"
         >{{ running ? "Running...": "Run Simulation" }}</b-button>

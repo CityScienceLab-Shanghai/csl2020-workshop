@@ -6,7 +6,9 @@
     >
         <b-form-input 
             id="range-1" type="range"
-            min="-5" max="5" step="0.01"
+            :min="min"
+            :max="max" 
+            :step="step"
             v-model="value"
         >
         </b-form-input>
@@ -20,7 +22,19 @@ export default {
         id: String,
         name: String,
         description: String,
-        default: Number
+        default: Number,
+        step: {
+            type: Number,
+            default: 0.01
+        },
+        min: {
+            type: Number,
+            default: -5
+        },
+        max: {
+            type: Number,
+            default: 5
+        }
     },
     data: function () {
         return {

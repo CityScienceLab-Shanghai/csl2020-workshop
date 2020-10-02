@@ -1,16 +1,9 @@
 <template>
     <div class="visualization">
-        <!-- <img src="geodata/map.svg" /> -->
-        <!-- <div class="agent" 
-            v-for="agent in simData[step]" 
-            :key="agent.name"
-            :style="{
-                top: transformAgent(agent[currentMode][0]) + 'px', 
-                left: transformAgent(agent[currentMode][1]) + 'px',
-                width: agent.population + 3 + 'px', 
-                height: agent.population + 3 + 'px',
-            }"></div>  -->
-        <svg></svg>
+        <svg :width="width" :height="height"></svg>
+        <canvas 
+            :width="width * 2" :height="height * 2" 
+            :style="{width: width + 'px', height: height + 'px'}"></canvas>
     </div>
 </template>
 
@@ -29,13 +22,42 @@ export default {
     name: 'Visualization',
     props: {
         simData: Object,
-        step: Number
+        step: Number,
+        animate: Boolean,
     },
     data: function () {
         return {
             currentMode: 'home',
-            dataset: {}
+            currentTime: 0,
+            dataset: {},
+            customBase: document.createElement('custom'),
+            width: window.innerWidth, 
+            height: window.innerHeight,
+            lastResize: 0,
         };
+    },
+    computed: {
+        projection () {
+            return d3.geoMercator()
+                .center([-71.0865450, 42.3672538])
+                .scale(1500000)
+                .translate([this.width / 2, this.height / 2]);
+        }
+    },
+    watch: {
+        step () {
+            this.dataset = this.simData[this.step];
+            this.updateDataset();
+        },
+
+        simData () {
+            this.dataset = this.simData[this.step];
+            this.updateDataset();
+        },
+
+        currentMode () {
+            console.log(this.currentMode);
+        }
     },
     methods: {
         parseAgentStep(data) {
@@ -56,82 +78,113 @@ export default {
             return parsedData;
         },
 
-        draw() {
-            var svg = d3.select(".visualization svg");
-            var projection = d3.geoMercator()
-                //.center([-71.0682, 42.3602])
-                .center([-71.0933, 42.3737])
-                .scale(1500000)
-                //.translate([window.innerWidth / 2, window.innerHeight / 2]);
-                //.clipExtent([[-71.0933, 42.3737], [-71.3933, 42.6737]])
-            var path = d3.geoPath().projection(projection);
-
-            var gridUrl = "/geodata/grid80.geojson";
-            var mapUrl = "/geodata/greater_area.geojson";
-            
-            Promise.all([d3.json(gridUrl), d3.json(mapUrl)]).then((results) => {
-                var grid = results[0];
-                var map = results[1];
-
-                svg.append("path")
-                    .attr("d", path(map))
-                    .attr("fill", "white")
-                    .attr("stroke", "lightgray");
+        drawMap() {
+            return new Promise((resolve) => {
+                var path = d3.geoPath().projection(this.projection);
+                var gridUrl = "/geodata/grid80.geojson";
+                var mapUrl = "/geodata/greater_area.geojson";
                 
-                svg.append("path")
-                    .attr("d", path(grid))
-                    .attr("fill", "rgba(0, 0, 0, 0)")
-                    .attr("stroke", "red");
+                Promise.all([d3.json(gridUrl), d3.json(mapUrl)]).then((results) => {
+                    var grid = results[0];
+                    var map = results[1];
 
-                
-                console.log("drawing", this.dataset);
+                    var svg = d3.select(".visualization svg");
+                    svg.selectAll("*").remove();
 
-                svg.selectAll("circle")
-                    .data(this.dataset)
-                    .enter()
-                    .append("circle")
-                    .attr("r", (d) => {
-                        return d.population * 0.7 + 1.5;
-                    })
-                    .attr("cx", (d) => {
-                        return projection(d._coord)[0];
-                    })
-                    .attr("cy", (d) => {
-                        return projection(d._coord)[1];
-                    })
-                    .attr("fill", (d) => {
-                        return d.income === 0 ? 'red': 'blue';
-                    })
-                    .attr("opacity", 0.6)
-            });
+                    svg.append("path")
+                        .attr("d", path(map))
+                        .attr("fill", "white")
+                        .attr("stroke", "lightgray");
+                    
+                    svg.append("path")
+                        .attr("d", path(grid))
+                        .attr("fill", "rgba(0, 0, 0, 0)")
+                        .attr("stroke", "red");
+
+                    resolve();
+                });
+            })
         },
 
-        update () {
-            var svg = d3.select(".visualization svg");
-            var projection = d3.geoMercator()
-                //.center([-71.0682, 42.3602])
-                .center([-71.0933, 42.3737])
-                .scale(1500000)
-            
-            svg.selectAll("circle")
+        bindAgents() {
+            var vis = d3.select(this.customBase);
+            vis.selectAll("custom.circle")
+                .data(this.dataset)
+                .enter()
+                .append("custom")
+                .attr("class", 'circle')
+                .attr("r", (d) => {
+                    return d.population * 0.7 + 1.5;
+                })
+                .attr("x", (d) => {
+                    return this.projection(d._coord)[0];
+                })
+                .attr("y", (d) => {
+                    return this.projection(d._coord)[1];
+                })
+                .attr("fillStyle", (d) => {
+                    return d.income === 0 ? 'rgba(255, 0, 0, 0.6)': 'rgba(0, 0, 255, 0.6)';
+                })
+        },
+
+        drawAgents() {
+            var vis = d3.select(this.customBase);
+            var canvas = d3.select(".visualization canvas");
+            var width = canvas.node().width;
+            var height = canvas.node().height;
+            var context = canvas.node().getContext('2d');
+
+            context.save();
+
+            context.scale(2, 2);
+            context.clearRect(0, 0, this.width * 2, this.height * 2);
+            var elements = vis.selectAll('custom.circle');
+
+            function outOfBounds(x, y) {
+                return x < 0 || x >= width || y < 0 || y >= height;
+            }
+
+            function drawAgent() {
+                var node = d3.select(this);
+                if (outOfBounds(node.attr('x'), node.attr('y'))) return;
+                context.beginPath();
+                context.arc(node.attr('x'), node.attr('y'), node.attr('r'), 0, 2 * Math.PI, false);
+                context.fillStyle = node.attr('fillStyle');
+                context.fill();
+            }
+
+            elements.each(drawAgent);
+
+            context.restore();
+        },
+
+        updateAgents () {
+            var vis = d3.select(this.customBase);
+            vis.selectAll("custom.circle")
                 .data(this.dataset)
                 .transition()
                 .delay(() => {
-                    return gaussianRand() * 3500;
+                    return gaussianRand() * 5000;
                 })
                 .duration(3000)
                 .attr("r", (d) => {
                     return d.population * 0.7 + 1.5;
                 })
-                .attr("cx", (d) => {
-                    return projection(d._coord)[0];
+                .attr("x", (d) => {
+                    return this.projection(d._coord)[0];
                 })
-                .attr("cy", (d) => {
-                    return projection(d._coord)[1];
+                .attr("y", (d) => {
+                    return this.projection(d._coord)[1];
                 })
-                .attr("fill", (d) => {
-                    return d.income === 0 ? 'red': 'blue';
+                .attr("fillStyle", (d) => {
+                    return d.income === 0 ? 'rgba(255, 0, 0, 0.6)': 'rgba(0, 0, 255, 0.6)';
                 })
+
+            var t = d3.timer((elapsed) => {
+                this.drawAgents();
+                if (elapsed > 8000) t.stop();
+            }, 70);
+
         },
 
         updateDataset() {
@@ -144,44 +197,81 @@ export default {
             return (coord - 8000) / 4 - 400;
         }
     },
-    watch: {
-        simData () {
-            this.dataset = this.simData[this.step];
-            this.updateDataset();
-        },
-
-        currentMode () {
-            console.log(this.currentMode);
-        }
-    },
     mounted () {
+        function debounce(func){
+            var timer;
+            return function(event){
+                if(timer) clearTimeout(timer);
+                timer = setTimeout(func,500,event);
+            };
+        }
+        window.addEventListener('resize', debounce(() => {
+            console.log('debounce resize');
+            this.width = window.innerWidth;
+            this.height = window.innerHeight;
+            
+            this.drawMap().then(() => {
+                this.updateDataset();
+                var vis = d3.select(this.customBase);
+                vis.selectAll("custom.circle")
+                    .interrupt()
+                    .data(this.dataset)
+                    .attr("x", (d) => {
+                        return this.projection(d._coord)[0];
+                    })
+                    .attr("y", (d) => {
+                        return this.projection(d._coord)[1];
+                    })
+                this.drawAgents();
+            });
+        }));
+
         d3.json('agents_step0.json').then((data) => {
             this.$emit('agents-update', this.parseAgentStep(data));
         })
-
-        this.draw();
+        
+        this.drawMap().then(() => {
+            this.bindAgents();
+            this.drawAgents();
+        });
 
         setInterval(() => {
-            this.currentMode = this.currentMode === 'home' ? 'work' : 'home';
-            this.updateDataset();
-            this.update();
-        }, 10000);
+            if (this.animate) {
+                this.currentTime = (this.currentTime + 1) % 24;
+                this.$emit('time-update', this.currentTime);
+                if (this.currentTime === 7 || this.currentTime === 16) {
+                    this.currentMode = this.currentMode === 'home' ? 'work' : 'home';
+                    this.updateDataset();
+                    this.updateAgents();
+                }
+            }
+        }, 2000);
     }
 }
 </script>
 
 <style scoped>
 .visualization {
-    position: fixed;
+    position: absolute;
     top: 0px;
     left: 0px;
     width: 100%;
     height: 100%;
+    z-index: -1;
 }
 
 .visualization svg {
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: -1;
+}
+
+.visualization canvas {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 10;
 }
 
 .agent {

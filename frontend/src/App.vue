@@ -1,23 +1,54 @@
 <template>
     <div id="app">
         <Visualization 
-            :sim-data="agentsData"
-            :step="currentStep" 
-            @agents-update="updateAgentsData($event)"/>
+        :sim-data="agentsData"
+        :step="currentStep" 
+        :animate="animate"
+        @agents-update="updateAgentsData($event)"
+        @time-update="currentTime = Number.parseInt($event)"/>
         <b-container fluid>
-            <b-row>
-                <b-col cols="2">
+            <b-row class="h-100">
+                <b-col cols="3">
+                    <IncentivePanel
+                        :incentive-modes="incentiveModes"
+                        :current-mode="incentiveMode"
+                        @incentive-update="incentiveMode = Number.parseInt($event)"/>
                     <ControlPanel
-                        :panels="controlPanels"
+                        v-if="incentiveMode > 0"
+                        :panels="[[], staticPanels, dynamicPanels][incentiveMode]"
                         :simulateApi="simulateApi"
                         :statusApi="statusApi"
                         :resultsApi="resultsApi"
                         @simulation-update="updateSimulationData($event)"
                     />
                 </b-col>
-                <b-col cols="7"></b-col>
+                <b-col>
+                    <b-button size="lg" :variant="animate ? 'success' : 'danger'" @click="animate = !animate">
+                        <b-icon-pause-fill v-if="animate"></b-icon-pause-fill>
+                        <b-icon-play-fill v-if="!animate"></b-icon-play-fill>
+                        {{ currentTime }}:00
+                    </b-button>
+                </b-col>
                 <b-col cols="3">
                     <OutputPanel :panels="outputPanels" />
+                </b-col>
+            </b-row>
+            <b-row align-v="end">
+                <b-col cols="3"></b-col>
+                <b-col cols="6">
+                    <div id="slider">
+                        <b-input-group :prepend="'Simulation step: ' + (currentStep + 1)" class="mt-3">
+                            <b-form-input type="range" min="1" max="12" value="1" 
+                                @change="currentStep = Number.parseInt($event) - 1"></b-form-input>
+                            <!-- <b-input-group-append>
+                                <b-button :variant="animate ? 'success' : 'danger'" @click="animate = !animate">
+                                    <b-icon-pause-fill v-if="animate"></b-icon-pause-fill>
+                                    <b-icon-play-fill v-if="!animate"></b-icon-play-fill>
+                                    {{ currentTime }}:00
+                                </b-button>
+                            </b-input-group-append> -->
+                        </b-input-group>
+                    </div>
                 </b-col>
             </b-row>
         </b-container>
@@ -33,6 +64,7 @@ Vue.use(IconsPlugin);
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 
+import IncentivePanel from "./components/IncentivePanel.vue";
 import ControlPanel from "./components/ControlPanel.vue";
 import Visualization from "./components/Visualization.vue";
 import OutputPanel from "./components/OutputPanel.vue";
@@ -74,19 +106,25 @@ function makeLineChartData (sourceData) {
 export default {
     name: "App",
     components: {
+        IncentivePanel,
         ControlPanel,
         Visualization,
-        OutputPanel,
+        OutputPanel
     },
     data: function () {
         return {
             simulateApi: Config.simulateApi,
             statusApi: Config.statusApi,
             resultsApi: Config.resultsApi,
-            controlPanels: Config.controlPanels,
+            staticPanels: Config.staticPanels,
+            dynamicPanels: Config.dynamicPanels,
             outputPanels: Config.outputPanels,
+            incentiveModes: Config.incentiveModes,
+            incentiveMode: 0,
             agentsData: {},
-            currentStep: 0
+            currentStep: 0,
+            currentTime: 0,
+            animate: true,
         };
     },
     methods: {
@@ -97,12 +135,27 @@ export default {
 
         updateAgentsData (data) {
             this.agentsData = data;
+        },
+
+        changeStep (_, value) {
+            this.currentStep = Number.parseInt(value) - 1;
         }
     }
 };
 </script>
 
 <style>
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    -moz-user-select: none; 
+    -webkit-user-select: none; 
+    -ms-user-select:none; 
+    user-select:none;
+    -o-user-select:none;
+}
+
 #app {
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -114,5 +167,22 @@ export default {
 .container {
     margin: 0px;
     width: 100%;
+}
+
+.container-fluid {
+    height: 100%;
+    position: absolute;
+}
+
+.bar {
+    padding: 0.25rem;
+}
+
+.slider {
+    padding-bottom: 0.25rem;
+}
+
+#slider {
+    transform: translateY(-250%);
 }
 </style>
