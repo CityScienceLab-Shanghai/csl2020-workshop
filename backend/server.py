@@ -5,7 +5,7 @@ from xml_utils import *
 from xml.dom.minidom import parse
 import xml.dom.minidom
 from xmlTemplate import getXML
-import json
+import json, re
 
 proc = None
 
@@ -37,7 +37,11 @@ class WSGICopyBody(object):
 
 ROOT_PATH = '/home/ubuntu/headless'
 app = Flask(__name__)
+pattern = re.compile("people[0-9]+")
 # app.wsgi_app = WSGICopyBody(app.wsgi_app)
+
+def stringfy(matched):
+    return (f"\"{matched.group()}\"")
 
 @app.route('/')
 def check():
@@ -47,7 +51,7 @@ def check():
 def checkStatus():
     global proc
     if proc:
-        if not proc.poll():
+        if proc.poll() is None:
             return "Running"
         return "Terminated"
     else:
@@ -76,8 +80,13 @@ def getResult2():
         step_result = {}
         Variables = getXMLNode(step, 'Variable')
         for v in Variables:
+            value = getNodeValue(v)
             if 'Loc' in getAttrValue(v, 'name'):
-                step_result[getAttrValue(v, 'name')] = getNodeValue(v).replace('location','').replace(';',',')
+                value = value.replace('location','').replace(';',',')
+            if 'ame' in getAttrValue(v, 'name'):
+                value = re.sub(pattern, stringfy, value)
+            if 'List' in getAttrValue(v, 'name'):
+                step_result[getAttrValue(v, 'name')] = json.loads(value)
             else:
                 step_result[getAttrValue(v, 'name')] = getNodeValue(v)
         Result[getAttrValue(step, 'id')] = step_result
@@ -99,8 +108,13 @@ def getResult():
         step_result = {}
         Variables = getXMLNode(step, 'Variable')
         for v in Variables:
+            value = getNodeValue(v)
             if 'Loc' in getAttrValue(v, 'name'):
-                step_result[getAttrValue(v, 'name')] = getNodeValue(v).replace('location','').replace(';',',')
+                value = value.replace('location','').replace(';',',')
+            if 'ame' in getAttrValue(v, 'name'):
+                value = re.sub(pattern, stringfy, value)
+            if 'List' in getAttrValue(v, 'name'):
+                step_result[getAttrValue(v, 'name')] = json.loads(value)
             else:
                 step_result[getAttrValue(v, 'name')] = getNodeValue(v)
         Result[getAttrValue(step, 'id')] = step_result
