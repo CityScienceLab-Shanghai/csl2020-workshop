@@ -20,6 +20,11 @@ t = string.Template("""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 		<Output id="9" name="Work or Live in Kendall" framerate="1" />
 		<Output id="10" name="Diversity" framerate="1" />
 		<Output id="11" name="Low Income Proportion" framerate="1" />
+		<Output id="12" name="Name List" framerate="1" />
+		<Output id="13" name="Work Loc List" framerate="1" />
+		<Output id="14" name="Home Loc List" framerate="1" />
+		<Output id="15" name="Population List" framerate="1" />
+		<Output id="16" name="Income List" framerate="1" />
 	  </Outputs>
 	</Simulation>
 </Experiment_plan>""")
