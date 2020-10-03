@@ -5,6 +5,7 @@ from xml_utils import *
 from xml.dom.minidom import parse
 import xml.dom.minidom
 from xmlTemplate import getXML
+import json
 
 proc = None
 
@@ -65,28 +66,7 @@ def RunSim():
         print(proc.poll())
         return str(proc.poll())
 
-@app.route('/start2')
-def startSim():
-    status, output = subprocess.getstatusoutput(f'bash {ROOT_PATH}/gama-headless.sh {ROOT_PATH}/CSS2020.xml {ROOT_PATH}/CSS2020')
-    print(status, output)
-    return output
-
 @app.route('/result')
-def getResult():
-    DOMTree = xml.dom.minidom.parse(f"{ROOT_PATH}/CSS2020/simulation-outputs2.xml")
-    collection = DOMTree.documentElement
-    Steps = getXMLNode(collection, 'Step')
-    Result = {str(id):{} for id in range(1,13)}
-    for step in Steps:
-        step_result = {}
-        # print(getAttrValue(step, 'id'))
-        Variables = getXMLNode(step, 'Variable')
-        for v in Variables:
-            step_result[getAttrValue(v, 'name')] = getNodeValue(v)
-        Result[getAttrValue(step, 'id')] = step_result
-    return jsonify(Result)
-
-@app.route('/newresult')
 def getResult2():
     DOMTree = xml.dom.minidom.parse(f"{ROOT_PATH}/CSS2020/simulation-outputs1.xml")
     collection = DOMTree.documentElement
@@ -96,9 +76,36 @@ def getResult2():
         step_result = {}
         Variables = getXMLNode(step, 'Variable')
         for v in Variables:
-            step_result[getAttrValue(v, 'name')] = getNodeValue(v)
+            if 'Loc' in getAttrValue(v, 'name'):
+                step_result[getAttrValue(v, 'name')] = getNodeValue(v).replace('location','').replace(';',',')
+            else:
+                step_result[getAttrValue(v, 'name')] = getNodeValue(v)
         Result[getAttrValue(step, 'id')] = step_result
     return jsonify(Result)
+
+@app.route('/debug_start')
+def startSim():
+    status, output = subprocess.getstatusoutput(f'bash {ROOT_PATH}/gama-headless.sh {ROOT_PATH}/CSS2020.xml {ROOT_PATH}/CSS2020')
+    print(status, output)
+    return output
+
+@app.route('/debug_result')
+def getResult():
+    DOMTree = xml.dom.minidom.parse(f"{ROOT_PATH}/CSS2020/simulation-outputs2.xml")
+    collection = DOMTree.documentElement
+    Steps = getXMLNode(collection, 'Step')
+    Result = {str(id):{} for id in range(1,13)}
+    for step in Steps:
+        step_result = {}
+        Variables = getXMLNode(step, 'Variable')
+        for v in Variables:
+            if 'Loc' in getAttrValue(v, 'name'):
+                step_result[getAttrValue(v, 'name')] = getNodeValue(v).replace('location','').replace(';',',')
+            else:
+                step_result[getAttrValue(v, 'name')] = getNodeValue(v)
+        Result[getAttrValue(step, 'id')] = step_result
+    return jsonify(Result)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug = True)
