@@ -1,11 +1,10 @@
 import subprocess
 from flask import Flask, jsonify, request, g
-import json
 from xml_utils import *
 from xml.dom.minidom import parse
 import xml.dom.minidom
 from xmlTemplate import getXML
-import json, re
+import json, re, os, signal
 
 proc = None
 
@@ -61,6 +60,18 @@ def checkStatus():
     else:
         return "Terminated"
 
+@app.route('/stop')
+def kill():
+    global proc
+    if proc:
+        if proc.poll() is None:
+            try:
+                os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+                return "Killed"
+            except:
+                return "Failed"
+    return "No Running Process"
+
 @app.route('/start', methods = ['POST', 'GET'])
 def RunSim():
     global proc
@@ -70,7 +81,7 @@ def RunSim():
         body = json.loads(str(request.get_data().decode()))
         with open(f"{ROOT_PATH}/CSS2020.xml","w") as f:
             f.write(getXML(**body))
-        proc = subprocess.Popen(f'bash {ROOT_PATH}/gama-headless.sh {ROOT_PATH}/CSS2020.xml {ROOT_PATH}/CSS2020', shell=True, stdout=subprocess.PIPE)
+        proc = subprocess.Popen(['bash', f'{ROOT_PATH}/gama-headless.sh', f'{ROOT_PATH}/CSS2020.xml', f'{ROOT_PATH}/CSS2020'], stdout=subprocess.PIPE, preexec_fn=os.setsid)
         print(proc.poll())
         return str(proc.poll())
 
