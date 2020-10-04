@@ -1,12 +1,25 @@
 import string
 
-defaultValue = {'id': '1', 'b_move_low_inc':'0.0'}
+keys = ['diversity_target', 'low_inc_pop_ratio_target', 'commute_distance_target', 
+'building_energy_target', 'construction_intensity', 'rent_discount_ratio_all', 'rent_discount_ratio_low_inc', 
+'rent_discount_ratio_less_commuting', 'rent_discount_ratio_small_scale']
+
+defaultValue = {key:'0.0' for key in keys}
+defaultValue[id] = '1'
 
 t = string.Template("""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Experiment_plan>
 	<Simulation id="${id}" sourcePath="/home/ubuntu/Model/models/workshop.gaml" finalStep="13" experiment="gui">
 	  <Parameters>
-	  	<Parameter name="b_move_low_inc" type="FLOAT" value="${b_move_low_inc}" />
+	  	<Parameter name="construction_intensity" type="FLOAT" value="${construction_intensity}" />
+		<Parameter name="rent_discount_ratio_all" type="FLOAT" value="${rent_discount_ratio_all}" />
+		<Parameter name="rent_discount_ratio_low_inc" type="FLOAT" value="${rent_discount_ratio_low_inc}" />
+		<Parameter name="rent_discount_ratio_less_commuting" type="FLOAT" value="${rent_discount_ratio_less_commuting}" />
+		<Parameter name="rent_discount_ratio_small_scale" type="FLOAT" value="${rent_discount_ratio_small_scale}" />
+		<Parameter name="diversity_target" type="FLOAT" value="${diversity_target}" />
+		<Parameter name="low_inc_pop_ratio_target" type="FLOAT" value="${low_inc_pop_ratio_target}" />
+		<Parameter name="commute_distance_target" type="FLOAT" value="${commute_distance_target}" />
+		<Parameter name="building_energy_target" type="FLOAT" value="${building_energy_target}" />
 	  </Parameters>
 	  <Outputs>
 		<Output id="1" name="Move to Kendall: Low Income" framerate="1" />
@@ -36,5 +49,5 @@ def getXML(**newValue):
             tempValue[k] = v
     return t.safe_substitute(tempValue)
 
-if __name__ == "__main__":
-    print(t.safe_substitute(values))
+# if __name__ == "__main__":
+#     print(t.safe_substitute(values))
