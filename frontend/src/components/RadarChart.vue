@@ -11,12 +11,17 @@ export default {
             options: {
                 scale: {
                     gridLines: {
-                        circular: true
+                        circular: true,
+                        color: 'rgba(255, 255, 255, 0.3)'
+                    },
+                    angleLines : {
+                        color: 'rgba(255, 255, 255, 0.3)'
                     },
                     ticks: {
                         beginAtZero: true,
                         suggestedMax: 100,
-                        maxTicksLimit: 7
+                        maxTicksLimit: 7,
+                        backdropColor: 'black'
                     },
                 },
                 legend: {

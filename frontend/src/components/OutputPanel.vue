@@ -7,7 +7,8 @@
             :description="panel.description"
             :controls="panel.controls"
             :charts="panel.charts"
-            :visible="true"
+            :visible="panel.name === currentPanel"
+            @mouse-entered="currentPanel = panel.name"
         ></PanelPane>
     </div>
 </template>
@@ -24,7 +25,9 @@ export default {
         PanelPane,
     },
     data: function () {
-        return {};
+        return {
+            currentPanel: this.panels[0].name,
+        };
     },
     methods: {}
 };
@@ -32,4 +35,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+img {
+    position: absolute;
+    width: 90%;
+    bottom: 2em;
+}
 </style>

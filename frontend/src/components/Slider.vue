@@ -9,6 +9,7 @@
             :min="min"
             :max="max" 
             :step="step"
+            :disabled="disabled"
             v-model="value"
         >
         </b-form-input>
@@ -34,6 +35,10 @@ export default {
         max: {
             type: Number,
             default: 5
+        },
+        disabled: {
+            type: Boolean,
+            default: false
         }
     },
     data: function () {
@@ -51,5 +56,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+.custom-range {
+    height: 1rem;
+}
 </style>

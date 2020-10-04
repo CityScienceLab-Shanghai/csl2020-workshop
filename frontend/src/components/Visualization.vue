@@ -34,6 +34,8 @@ export default {
             width: window.innerWidth, 
             height: window.innerHeight,
             lastResize: 0,
+            highIncomeColor: '#D06DB2',
+            lowIncomeColor: '#1CA9BF'
         };
     },
     computed: {
@@ -48,11 +50,15 @@ export default {
         step () {
             this.dataset = this.simData[this.step];
             this.updateDataset();
+            this.bindAgents();
+            this.drawAgents();
         },
 
         simData () {
             this.dataset = this.simData[this.step];
             this.updateDataset();
+            this.bindAgents();
+            this.drawAgents();
         },
 
         currentMode () {
@@ -60,23 +66,6 @@ export default {
         }
     },
     methods: {
-        parseAgentStep(data) {
-            var parsedData = {};
-            for (var step = 0; step < 12; step++) {
-                if (!data[step]) continue;
-                parsedData[step] = [];
-                for (var agentid in data[step].name) {
-                    parsedData[step].push( {
-                        name: data[step].name[agentid],
-                        home: data[step].home_loc[agentid],
-                        work: data[step].work_loc[agentid],
-                        population: data[step].population[agentid], 
-                        income: data[step].income[agentid]
-                    } );
-                }
-            }
-            return parsedData;
-        },
 
         drawMap() {
             return new Promise((resolve) => {
@@ -93,13 +82,13 @@ export default {
 
                     svg.append("path")
                         .attr("d", path(map))
-                        .attr("fill", "white")
-                        .attr("stroke", "lightgray");
+                        .attr("fill", "rgb(0, 0, 0)")
+                        .attr("stroke", "#303030");
                     
                     svg.append("path")
                         .attr("d", path(grid))
-                        .attr("fill", "rgba(0, 0, 0, 0)")
-                        .attr("stroke", "red");
+                        .attr("fill", "#141414")
+                        .attr("stroke", "#303030");
 
                     resolve();
                 });
@@ -108,13 +97,14 @@ export default {
 
         bindAgents() {
             var vis = d3.select(this.customBase);
+            vis.selectAll("*").remove();
             vis.selectAll("custom.circle")
                 .data(this.dataset)
                 .enter()
                 .append("custom")
                 .attr("class", 'circle')
                 .attr("r", (d) => {
-                    return d.population * 0.7 + 1.5;
+                    return Math.log(d.population * 1.5 + 2 + 1 / Math.E);
                 })
                 .attr("x", (d) => {
                     return this.projection(d._coord)[0];
@@ -123,8 +113,10 @@ export default {
                     return this.projection(d._coord)[1];
                 })
                 .attr("fillStyle", (d) => {
-                    return d.income === 0 ? 'rgba(255, 0, 0, 0.6)': 'rgba(0, 0, 255, 0.6)';
+                    return d.income === 0 ? this.lowIncomeColor : this.highIncomeColor;
                 })
+
+                .exit().remove()
         },
 
         drawAgents() {
@@ -166,9 +158,9 @@ export default {
                 .delay(() => {
                     return gaussianRand() * 5000;
                 })
-                .duration(3000)
+                .duration(5000)
                 .attr("r", (d) => {
-                    return d.population * 0.7 + 1.5;
+                    return Math.log(d.population * 1.5 + 2 + 1 / Math.E);
                 })
                 .attr("x", (d) => {
                     return this.projection(d._coord)[0];
@@ -177,12 +169,12 @@ export default {
                     return this.projection(d._coord)[1];
                 })
                 .attr("fillStyle", (d) => {
-                    return d.income === 0 ? 'rgba(255, 0, 0, 0.6)': 'rgba(0, 0, 255, 0.6)';
+                    return d.income === 0 ? this.lowIncomeColor: this.highIncomeColor;
                 })
 
             var t = d3.timer((elapsed) => {
                 this.drawAgents();
-                if (elapsed > 8000) t.stop();
+                if (elapsed > 10000) t.stop();
             }, 70);
 
         },
@@ -225,10 +217,6 @@ export default {
                 this.drawAgents();
             });
         }));
-
-        d3.json('agents_step0.json').then((data) => {
-            this.$emit('agents-update', this.parseAgentStep(data));
-        })
         
         this.drawMap().then(() => {
             this.bindAgents();
@@ -239,7 +227,7 @@ export default {
             if (this.animate) {
                 this.currentTime = (this.currentTime + 1) % (24 * 60);
                 this.$emit('time-update', this.currentTime);
-                if (this.currentTime === 7 * 60 || this.currentTime === 16 * 60) {
+                if (this.currentTime === 7 * 60 + 30 || this.currentTime === 17 * 60) {
                     this.currentMode = this.currentMode === 'home' ? 'work' : 'home';
                     this.updateDataset();
                     this.updateAgents();

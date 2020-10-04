@@ -13,8 +13,11 @@ export default {
                 responsive: true,
                 maintainAspectRatio: false,
                 legend: {
+                    align: 'end',
                     labels: {
-                        boxWidth: 30
+                        boxWidth: 10,
+                        fontSize: 10,
+                        fontColor: 'white'
                     }
                 }
             }
@@ -28,6 +31,6 @@ export default {
 
 <style scoped>
 canvas#line-chart {
-    height: 15em !important;
+    height: 8em !important;
 }
 </style>

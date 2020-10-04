@@ -4,6 +4,7 @@
         :title="name"
         :sub-title="description"
         @mouseenter="$emit('mouse-entered')"
+        @click="$emit('mouse-entered')"
     >
         <b-collapse
             :visible="visible"
@@ -15,15 +16,19 @@
                 :name="control.name"
                 :description="control.description"
                 :default="control.default"
+                :min="control.min"
+                :max="control.max"
+                :disabled="control.disabled"
                 @slider-change="dataUpdated"
             ></Slider>
 
-            <Chart
-                v-for="chart in charts"
-                :key="chart.id"
-                :type="chart.type"
-                :chart-data="chart.data"
-            ></Chart>
+            <div v-for="chart in charts" :key="chart.id">
+                <b v-if="chart.title" style="font-size: 1em;">{{chart.title}}</b>
+                <Chart
+                    :type="chart.type"
+                    :chart-data="chart.data"
+                ></Chart>
+            </div>
         </b-collapse>
     </b-card>
 </template>
@@ -65,7 +70,31 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.b-card {
-    padding-top: 10em;
+.card {
+    border: #979797;
+}
+
+.card-body {
+    background: black;
+    border: 1px solid #979797;
+    border-radius: 5px;
+    font-size: 0.9em !important;
+    color: white;
+}
+
+.card-title {
+    color: white !important;
+    font-size: 1.5em !important;
+}
+
+.card-subtitle.text-muted {
+    color: white !important;
+    font-size: 0.9em !important;
+    font-weight: 100;
+}
+
+.col-form-label {
+    font-size: 0.9em !important;
+    font-weight: 100;
 }
 </style>
