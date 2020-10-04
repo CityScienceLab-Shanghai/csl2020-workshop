@@ -12,12 +12,15 @@
             @mouse-entered="currentPanel = panel.name"
         ></PanelPane>
         
-        <b-button
-            block
-            variant="primary"
-            :disabled="running"
-            @click="runSimulation"
-        >{{ running ? "Running...": "Run Simulation" }}</b-button>
+        <b-button-group class="simulation-button">
+            <b-button variant="primary" :disabled="running" @click="runSimulation">
+                {{ running ? "Running..." + Math.floor(progress / 60 * 100) + '%' : "Run Simulation" }}
+            </b-button>
+
+            <b-button class="stop" variant="primary" v-if="running" @click="stopSimulation">
+                <b-icon-stop-fill></b-icon-stop-fill>
+            </b-button>
+        </b-button-group>
     </div>
 </template>
 
@@ -31,7 +34,8 @@ export default {
         simulateApi: String,
         statusApi: String,
         resultsApi: String,
-        panels: Array
+        panels: Array,
+        incentiveMode: Number,
     },
     components: {
         PanelPane,
@@ -39,6 +43,7 @@ export default {
     data: function () {
         return {
             running: false, // Whether the simulation is currently running
+            progress: 0,
             currentPanel: this.panels[0].name, // Current focused panel. Only show one panel at a time.
             parameters: {}
         };
@@ -56,10 +61,15 @@ export default {
             console.log("Running simulation");
             console.log(this.parameters);
 
-            axios.get(this.simulateApi, this.parameters).then(() => {
+            axios.post(this.simulateApi, this.parameters).then(() => {
                 this.running = true;
+                this.progress = 0;
                 this.startHeartBeat();
             });
+        },
+
+        stopSimulation() {
+            console.log('Stopping simulation');
         },
 
         // Start a heartbeat checking for completion once per second
@@ -67,11 +77,15 @@ export default {
             var heartbeat = setInterval(() => {
                 axios.get(this.statusApi).then((response) => {
                     console.log(response);
-                    // if (response.data === 'Terminated') {
-                        this.running = false;
-                        clearInterval(heartbeat);
+                    this.progress = Math.min(this.progress + 1, 60);
+                    if (response.data === 'Terminated') {
+                        this.progress = 60;
                         this.getResults();
-                    // }
+                        setTimeout(() => {
+                            this.running = false;
+                            clearInterval(heartbeat);
+                        }, 3000);
+                    }
                 });
             }, 1000);
         },
@@ -92,6 +106,18 @@ export default {
                     this.parameters[control.id] = control.default;
                 }
             }
+        }, 
+        incentiveMode () {
+            if (this.incentiveMode === 0) {
+                this.parameters['incentive_policy'] = false;
+                this.parameters['dynamic_policy'] = false;
+            } else if (this.incentiveMode === 1) {
+                this.parameters['incentive_policy'] = true;
+                this.parameters['dynamic_policy'] = false;
+            } else if (this.incentiveMode === 2) {
+                this.parameters['incentive_policy'] = true;
+                this.parameters['dynamic_policy'] = true;
+            }
         }
     },
     mounted () {
@@ -100,10 +126,23 @@ export default {
                 this.parameters[control.id] = control.default;
             }
         }
+        this.parameters['incentive_policy'] = false;
+        this.parameters['dynamic_policy'] = false;
+
+        axios.get(this.statusApi).then((response) => {
+            console.log(response);
+        });
     }
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.simulation-button {
+    width: 100%;
+}
+
+.simulation-button .stop {
+    flex: 0 0 1em;
+}
 </style>

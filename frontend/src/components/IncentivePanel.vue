@@ -1,26 +1,18 @@
 <template>
-    <b-card style="margin-bottom: 0.5em;" 
-        title="Incentive policy"
-        sub-title="You can choose from three different policies: no incentives (baseline model), static incentives, and dynamic incentives.">
+    <div class="incentive-panel">
+        <div>
+            <p class="title">Equity without Zoning</p>
+            <p class="description">You can select an <b>incentive policy</b> and run the <b>simulation</b> below.</p>
+        </div>
 
         <b-dropdown id="dropdown-1" 
-            block
-            class="m-2"
-            menu-class="w-100"
-            variant="primary"
+            class="m-1" size="sm"
             :text="incentiveModes[currentMode]" >
             <b-dropdown-item @click="$emit('incentive-update', 0)">No incentives</b-dropdown-item>
             <b-dropdown-item @click="$emit('incentive-update', 1)">Static incentives</b-dropdown-item>
             <b-dropdown-item @click="$emit('incentive-update', 2)">Dynamic incentives</b-dropdown-item>
         </b-dropdown>
-        <!-- 
-        <b-nav pills fill small>
-            
-            <b-nav-item active>None</b-nav-item>
-            <b-nav-item>Static</b-nav-item>
-            <b-nav-item>Dynamic</b-nav-item>
-        </b-nav> -->
-    </b-card>
+    </div>
 </template>
 
 <script>
@@ -39,7 +31,28 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.b-card {
-    padding-top: 10em;
+.incentive-panel {
+    color: white;
+    margin-bottom: 2em;
 }
+
+p.title {
+    font-size: 1.7em;
+    font-weight: 800;
+    margin-bottom: 0.2em;
+}
+
+p.description {
+    font-size: 0.8em;
+}
+
+.dropdown {
+    margin: 0 !important;
+}
+
+#dropdown-1__BV_toggle_ {
+    background: #2F2F2F;
+    border: 1px solid #717171;
+}
+
 </style>

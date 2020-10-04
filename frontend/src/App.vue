@@ -4,32 +4,35 @@
         :sim-data="agentsData"
         :step="currentStep" 
         :animate="animate"
-        @agents-update="updateAgentsData($event)"
         @time-update="updateCurrentTime(Number.parseInt($event))"/>
+        <img class="credit" src="images/credit.png"/>
         <b-container fluid>
             <b-row class="h-100">
-                <b-col cols="3">
+                <b-col class="panel-col">
                     <IncentivePanel
                         :incentive-modes="incentiveModes"
                         :current-mode="incentiveMode"
                         @incentive-update="incentiveMode = Number.parseInt($event)"/>
                     <ControlPanel
-                        v-if="incentiveMode > 0"
-                        :panels="[[], staticPanels, dynamicPanels][incentiveMode]"
+                        :panels="[nonePanels, staticPanels, dynamicPanels][incentiveMode]"
                         :simulateApi="simulateApi"
                         :statusApi="statusApi"
                         :resultsApi="resultsApi"
+                        :incentive-mode="incentiveMode"
                         @simulation-update="updateSimulationData($event)"
                     />
                 </b-col>
                 <b-col>
-                    <b-button size="lg" :variant="animate ? 'success' : 'danger'" @click="animate = !animate">
-                        <b-icon-pause-fill v-if="animate"></b-icon-pause-fill>
-                        <b-icon-play-fill v-if="!animate"></b-icon-play-fill>
-                        {{ currentTime }}
-                    </b-button>
+                    <div class="time">
+                        <div class="time-title">Time of the day</div>
+                        <div class="time-text" @click="animate = !animate">
+                            {{ currentTime }}
+                            <b-icon-pause-fill v-if="animate"></b-icon-pause-fill>
+                            <b-icon-play-fill v-if="!animate"></b-icon-play-fill>
+                        </div>
+                    </div>
                 </b-col>
-                <b-col cols="3">
+                <b-col class="panel-col">
                     <OutputPanel :panels="outputPanels" />
                 </b-col>
             </b-row>
@@ -38,15 +41,8 @@
                 <b-col cols="6">
                     <div id="slider">
                         <b-input-group :prepend="'Simulation step: ' + (currentStep + 1)" class="mt-3">
-                            <b-form-input type="range" min="1" max="12" value="1" 
-                                @change="currentStep = Number.parseInt($event) - 1"></b-form-input>
-                            <!-- <b-input-group-append>
-                                <b-button :variant="animate ? 'success' : 'danger'" @click="animate = !animate">
-                                    <b-icon-pause-fill v-if="animate"></b-icon-pause-fill>
-                                    <b-icon-play-fill v-if="!animate"></b-icon-play-fill>
-                                    {{ currentTime }}:00
-                                </b-button>
-                            </b-input-group-append> -->
+                            <b-form-input type="range" min="0" max="12" value="0" 
+                            @change="currentStep = Number.parseInt($event)"></b-form-input>
                         </b-input-group>
                     </div>
                 </b-col>
@@ -73,34 +69,34 @@ import Config from "./Config.js";
 
 function makeRadarChartData (sourceData) {
     var data = {...Config.outputPanels[0].charts[0].data}
-    data.datasets[2].data = [
-        Number.parseFloat(sourceData[12]['Low Income Proportion']) * 100, 
-        Number.parseFloat(sourceData[12]['Diversity']) * 100, 
-        10, 
-        Number.parseFloat(sourceData[12]['All']) / 20
+    data.datasets[0].data = [
+        Number.parseFloat(sourceData[12]['kendall_low_inc_ratio']) * 100, 
+        Number.parseFloat(sourceData[12]['kendall_diversity']) * 100, 
+        Number.parseFloat(sourceData[12]['residence_energy_per_person']),
+        Number.parseFloat(sourceData[12]['mean_commute_distance']) / 20
     ];
     return data;
 }
 
-function makeLineChartData (sourceData) {
-    var data = {...Config.outputPanels[0].charts[1].data}
-    data.datasets[0].data = [];
-    data.datasets[1].data = [];
+function makeLineChartsData (sourceData) {
+    var chartsData = [];
+    for (var chartId in Config.outputPanels[1].charts) {
+        var data = {...Config.outputPanels[1].charts[chartId].data}
 
-    data.datasets[3].data = [];
-    for (var i = 0; i < 12; i++) {
-        data.datasets[0].data.push(
-            Number.parseFloat(sourceData[i]['Low Income Proportion']) * 100
-        );
-        data.datasets[1].data.push(
-            Number.parseFloat(sourceData[i]['Diversity']) * 100
-        );
+        for (var datasetId in Config.outputPanels[1].charts[chartId].data.datasets) {
+            var datasetKey = Config.outputPanels[1].charts[chartId].data.datasets[datasetId].key;
+            data.datasets[datasetId].data = [];
+            for (var i = 0; i <= 12; i++) {
+                data.datasets[datasetId].data.push(
+                    Number.parseFloat(sourceData[i][datasetKey])
+                );
+            }
+        }
 
-        data.datasets[3].data.push(
-            Number.parseFloat(sourceData[i]['All']) / 20
-        );
+        chartsData.push(data);
     }
-    return data;
+    console.log(chartsData)
+    return chartsData;
 }
 
 export default {
@@ -116,6 +112,7 @@ export default {
             simulateApi: Config.simulateApi,
             statusApi: Config.statusApi,
             resultsApi: Config.resultsApi,
+            nonePanels: Config.nonePanels,
             staticPanels: Config.staticPanels,
             dynamicPanels: Config.dynamicPanels,
             outputPanels: Config.outputPanels,
@@ -130,15 +127,31 @@ export default {
     methods: {
         updateSimulationData (data) {
             this.outputPanels[0].charts[0].data = makeRadarChartData(data);
-            this.outputPanels[0].charts[1].data = makeLineChartData(data);
+            var chartData = makeLineChartsData(data);
+            for (var chartId in this.outputPanels[1].charts) {
+                this.outputPanels[1].charts[chartId].data = chartData[chartId];
+            }
+            this.updateAgentsData(data);
         },
 
         updateAgentsData (data) {
-            this.agentsData = data;
-        },
-
-        changeStep (_, value) {
-            this.currentStep = Number.parseInt(value) - 1;
+            console.log(data);
+            var parsedData = {};
+            for (var step = 0; step < 13; step++) {
+                if (!data[step]) continue;
+                parsedData[step] = [];
+                for (var agentid in data[step]['Name List']) {
+                    if (data[step]['Population List'][agentid] === 0) continue;
+                    parsedData[step].push( {
+                        name: data[step]['Name List'][agentid],
+                        home: data[step]['Home Loc List'][agentid],
+                        work: data[step]['Work Loc List'][agentid],
+                        population: data[step]['Population List'][agentid], 
+                        income: data[step]['Income List'][agentid]
+                    } );
+                }
+            }
+            this.agentsData = parsedData;
         },
 
         updateCurrentTime(time) {
@@ -154,6 +167,7 @@ export default {
 
 <style>
 html, body {
+    font-family: 'Titillium Web';
     margin: 0;
     padding: 0;
     overflow: hidden;
@@ -162,6 +176,8 @@ html, body {
     -ms-user-select:none; 
     user-select:none;
     -o-user-select:none;
+    background: black;
+    color: white;
 }
 
 #app {
@@ -192,5 +208,59 @@ html, body {
 
 #slider {
     transform: translateY(-250%);
+}
+
+.panel-col {
+    width: 20%;
+    min-width: 300px;
+    max-width: 350px;
+    height: 100%;
+    overflow-y: auto;
+    padding-bottom: 2em;
+}
+
+.time {
+    color: white;
+    text-align: center;
+    margin-top: 0.5em;
+}
+
+.time-title {
+    margin: 0px;
+    font-size: 0.8em;
+}
+
+.time-text {
+    margin: 0px;
+    font-size: 1.8em;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.input-group-text {
+    color: white;
+    background-color: #2F2F2F;
+    border: 1px solid #979797;
+    font-weight: bold;
+    font-size: 0.8em;
+}
+
+.input-group .custom-range {
+    background-color: black;
+    border: 1px solid #979797;
+}
+
+.input-group .custom-range:focus {
+    background-color: black;
+    border: 1px solid #979797;
+}
+
+img.credit {
+    position: absolute;
+    width: 17%;
+    min-width: 250px;
+    max-width: 350px;
+    bottom: 1em;
+    right: 1em;
 }
 </style>
