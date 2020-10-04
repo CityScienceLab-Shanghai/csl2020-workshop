@@ -2088,7 +2088,7 @@ experiment gui type: gui {
 		
 		// Output to XML
 		// for radar chart
-		monitor "mean_commute_distance" value: mean_commute_distance;
+		monitor "mean_commute_distance" value: mean_commute_distance[all];
 		monitor "kendall_diversity" value: kendall_diversity;
 		monitor "kendall_low_inc_ratio" value: kendall_low_inc_ratio;
 		monitor "residence_energy_per_person" value: residence_energy_per_person;
@@ -2098,7 +2098,7 @@ experiment gui type: gui {
 		monitor "the_developer.finance" value: the_developer.finance;
 		monitor "the_developer.expenditure_total" value: the_developer.expenditure_total;
 		monitor "the_developer.revene_total" value: the_developer.revene_total;
-		monitor "commute_distance_decrease" value: commute_distance_decrease;
+		monitor "commute_distance_decrease" value: commute_distance_decrease[mean];
 		monitor "kendall_virtual_block.crt_total_pop" value: kendall_virtual_block.crt_total_pop;
 		monitor "kendall_virtual_block.crt_low_inc_pop" value: kendall_virtual_block.crt_low_inc_pop;
 		monitor "kendall_virtual_block.crt_high_inc_pop" value: kendall_virtual_block.crt_high_inc_pop;
