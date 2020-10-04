@@ -2,9 +2,9 @@ import string
 
 keys = ['diversity_target', 'low_inc_pop_ratio_target', 'commute_distance_target', 
 'building_energy_target', 'construction_intensity', 'rent_discount_ratio_all', 'rent_discount_ratio_low_inc', 
-'rent_discount_ratio_less_commuting', 'rent_discount_ratio_small_scale']
+'rent_discount_ratio_less_commuting', 'rent_discount_ratio_small_scale', 'incentive_policy', 'dynamic_policy']
 
-defaultValue = {key:'0.0' for key in keys}
+defaultValue = {key:'0' for key in keys}
 defaultValue['id'] = '1'
 
 t = string.Template("""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -20,6 +20,8 @@ t = string.Template("""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 		<Parameter name="low_inc_pop_ratio_target" type="FLOAT" value="${low_inc_pop_ratio_target}" />
 		<Parameter name="commute_distance_target" type="FLOAT" value="${commute_distance_target}" />
 		<Parameter name="building_energy_target" type="FLOAT" value="${building_energy_target}" />
+		<Parameter name="incentive_policy" type="BOOLEAN" value="${incentive_policy}" />
+		<Parameter name="dynamic_policy" type="BOOLEAN" value="${dynamic_policy}" />
 	  </Parameters>
 	  <Outputs>
 		<Output id="1" name="mean_commute_distance" framerate="1" />

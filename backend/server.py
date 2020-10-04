@@ -37,11 +37,15 @@ class WSGICopyBody(object):
 
 ROOT_PATH = '/home/ubuntu/headless'
 app = Flask(__name__)
-pattern = re.compile("people[0-9]+")
+pattern_name = re.compile("people[0-9]+")
+pattern_num = re.compile("[0-9]+\.[0-9]+")
 # app.wsgi_app = WSGICopyBody(app.wsgi_app)
 
 def stringfy(matched):
     return (f"\"{matched.group()}\"")
+
+def floatAccuracyContorl(matched):
+    return (f"{round(float(matched.group()), 6)}")
 
 @app.route('/')
 def check():
@@ -81,14 +85,16 @@ def getResult2():
         Variables = getXMLNode(step, 'Variable')
         for v in Variables:
             value = getNodeValue(v)
+            value = re.sub(pattern_num, floatAccuracyContorl, value)
             if 'Loc' in getAttrValue(v, 'name'):
                 value = value.replace('location','').replace(';',',')
             if 'ame' in getAttrValue(v, 'name'):
-                value = re.sub(pattern, stringfy, value)
+                value = re.sub(pattern_name, stringfy, value)
+                value = value.replace('people', '')
             if 'List' in getAttrValue(v, 'name'):
                 step_result[getAttrValue(v, 'name')] = json.loads(value)
             else:
-                step_result[getAttrValue(v, 'name')] = getNodeValue(v)
+                step_result[getAttrValue(v, 'name')] = value
         Result[getAttrValue(step, 'id')] = step_result
     return jsonify(Result)
 
@@ -100,7 +106,7 @@ def startSim():
 
 @app.route('/debug_result')
 def getResult():
-    DOMTree = xml.dom.minidom.parse(f"{ROOT_PATH}/CSS2020/simulation-outputs2.xml")
+    DOMTree = xml.dom.minidom.parse(f"{ROOT_PATH}/CSS2020/simulation-outputs1.xml")
     collection = DOMTree.documentElement
     Steps = getXMLNode(collection, 'Step')
     Result = {str(id):{} for id in range(1,13)}
@@ -109,14 +115,16 @@ def getResult():
         Variables = getXMLNode(step, 'Variable')
         for v in Variables:
             value = getNodeValue(v)
+            value = re.sub(pattern_num, floatAccuracyContorl, value)
             if 'Loc' in getAttrValue(v, 'name'):
                 value = value.replace('location','').replace(';',',')
             if 'ame' in getAttrValue(v, 'name'):
-                value = re.sub(pattern, stringfy, value)
+                value = re.sub(pattern_name, stringfy, value)
+                value = value.replace('people', '')
             if 'List' in getAttrValue(v, 'name'):
-                step_result[getAttrValue(v, 'name')] = json.loads(value)
+                step_result[getAttrValue(v, 'name')] = json.loads(value)[:5]
             else:
-                step_result[getAttrValue(v, 'name')] = getNodeValue(v)
+                step_result[getAttrValue(v, 'name')] = value
         Result[getAttrValue(step, 'id')] = step_result
     return jsonify(Result)
 
