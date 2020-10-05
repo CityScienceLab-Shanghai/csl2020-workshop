@@ -34,6 +34,7 @@ export default {
         simulateApi: String,
         statusApi: String,
         resultsApi: String,
+        stopApi: String,
         panels: Array,
         incentiveMode: Number,
     },
@@ -45,7 +46,8 @@ export default {
             running: false, // Whether the simulation is currently running
             progress: 0,
             currentPanel: this.panels[0].name, // Current focused panel. Only show one panel at a time.
-            parameters: {}
+            parameters: {},
+            heartbeat: null
         };
     },
     methods: {
@@ -70,11 +72,21 @@ export default {
 
         stopSimulation() {
             console.log('Stopping simulation');
+
+            axios.get(this.stopApi).then((response) => {
+                console.log(response);
+                this.running = false;
+                this.progress = 0;
+                if (this.heartbeat) {
+                    clearInterval(this.heartbeat);
+                    this.heartbeat = null;
+                }
+            });
         },
 
         // Start a heartbeat checking for completion once per second
         startHeartBeat() {
-            var heartbeat = setInterval(() => {
+            this.heartbeat = setInterval(() => {
                 axios.get(this.statusApi).then((response) => {
                     console.log(response);
                     this.progress = Math.min(this.progress + 1, 60);
@@ -83,7 +95,8 @@ export default {
                         this.getResults();
                         setTimeout(() => {
                             this.running = false;
-                            clearInterval(heartbeat);
+                            clearInterval(this.heartbeat);
+                            this.heartbeat = null;
                         }, 3000);
                     }
                 });

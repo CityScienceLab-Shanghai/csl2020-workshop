@@ -59,6 +59,7 @@ export default {
             this.updateDataset();
             this.bindAgents();
             this.drawAgents();
+            this.currentTime = 0;
         },
 
         currentMode () {
@@ -156,9 +157,9 @@ export default {
                 .data(this.dataset)
                 .transition()
                 .delay(() => {
-                    return gaussianRand() * 5000;
+                    return gaussianRand() * 7000;
                 })
-                .duration(5000)
+                .duration(2000)
                 .attr("r", (d) => {
                     return Math.log(d.population * 1.5 + 2 + 1 / Math.E);
                 })
@@ -227,7 +228,7 @@ export default {
             if (this.animate) {
                 this.currentTime = (this.currentTime + 1) % (24 * 60);
                 this.$emit('time-update', this.currentTime);
-                if (this.currentTime === 7 * 60 + 30 || this.currentTime === 17 * 60) {
+                if (this.currentTime === 6 * 60 + 30 || this.currentTime === 16 * 60) {
                     this.currentMode = this.currentMode === 'home' ? 'work' : 'home';
                     this.updateDataset();
                     this.updateAgents();
