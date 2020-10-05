@@ -69,13 +69,17 @@ import OutputPanel from "./components/OutputPanel.vue";
 
 import Config from "./Config.js";
 
+Number.prototype.map = function (in_min, in_max, out_min, out_max) {
+    return (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 function makeRadarChartData (sourceData) {
     var data = {...Config.outputPanels[0].charts[0].data}
     data.datasets[0].data = [
-        Number.parseFloat(sourceData[12]['kendall_low_inc_ratio']) * 100, 
-        Number.parseFloat(sourceData[12]['kendall_diversity']) * 100, 
-        Number.parseFloat(sourceData[12]['residence_energy_per_person']),
-        Number.parseFloat(sourceData[12]['mean_commute_distance']) / 20
+        Number.parseFloat(sourceData[12]['kendall_low_inc_ratio']).map(0.35, 0.5, 0, 100), 
+        Number.parseFloat(sourceData[12]['kendall_diversity']).map(0.62, 0.7, 0, 100), 
+        Number.parseFloat(sourceData[12]['residence_energy_per_person']).map(54, 60, 100, 0),
+        Number.parseFloat(sourceData[12]['commute_distance_decrease']).map(-0.05, 0.3, 0, 100)
     ];
     return data;
 }

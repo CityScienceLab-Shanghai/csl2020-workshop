@@ -101,28 +101,29 @@ export default {
             });
         },
 
+        heartbeatHandler () {
+            axios.get(this.statusApi).then((response) => {
+                console.log(response);
+                this.progress = Math.min(this.progress + 1, this.maxProgress - 1);
+                this.percent = Math.floor(this.progress / this.maxProgress * 100) + '%';
+                if (response.data === 'Terminated') {
+                    this.progress = this.maxProgress - 1;
+                    this.percent = '99%';
+                    this.status = 'Loading results...';
+                    this.getResults();
+                    setTimeout(() => {
+                        this.progress = this.maxProgress;
+                        this.heartbeat = null;
+                    }, 3000);
+                } else {
+                    this.heartbeat = setTimeout(this.heartbeatHandler.bind(this), 1000);
+                }
+            });
+        },
+
         // Start a heartbeat checking for completion once per second
         startHeartBeat() {
-            this.heartbeat = setInterval(() => {
-                axios.get(this.statusApi).then((response) => {
-                    console.log(response);
-                    this.progress = Math.min(this.progress + 1, this.maxProgress - 1);
-                    this.percent = Math.floor(this.progress / this.maxProgress * 100) + '%';
-                    if (response.data === 'Terminated') {
-                        this.progress = this.maxProgress - 1;
-                        this.percent = '99%';
-                        this.status = 'Loading results...';
-                        this.getResults();
-                        clearInterval(this.heartbeat);
-                        setTimeout(() => {
-                            this.progress = this.maxProgress;
-                            this.percent = '100%';
-                            this.running = false;
-                            this.heartbeat = null;
-                        }, 3000);
-                    }
-                });
-            }, 1000);
+            this.heartbeat = setTimeout(this.heartbeatHandler.bind(this), 1000);
         },
 
         // Get simulation results and publish an event to update all data
@@ -131,6 +132,8 @@ export default {
                 console.log(response);
                 if (response.data !== 'GAMA is runninng') {
                     this.$emit("simulation-update", response.data);
+                    this.percent = '100%';
+                    this.running = false;
                 }
             });
         },

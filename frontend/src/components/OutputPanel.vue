@@ -35,9 +35,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-img {
-    position: absolute;
-    width: 90%;
-    bottom: 2em;
-}
 </style>

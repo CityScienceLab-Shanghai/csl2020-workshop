@@ -29,11 +29,11 @@ export default {
                     name: "Construction intensity",
                     min: 0, max: 1, default: 1, disabled: false
                 },
-                {
-                    id: "rent_discount_ratio_all",
-                    name: "Overall rent discount",
-                    min: 0.1, max: 1, default: 1, disabled: false
-                },
+                // {
+                //     id: "rent_discount_ratio_all",
+                //     name: "Overall rent discount",
+                //     min: 0.1, max: 1, default: 1, disabled: false
+                // },
                 {
                     id: "rent_discount_ratio_low_inc",
                     name: "Low income",
@@ -136,7 +136,7 @@ export default {
                             },
                             { 
                                 label: 'Baseline', 
-                                data: [43.4297, 68.4488, 56.570344, 132.653],
+                                data: [56.7432, 92.30286, 63.56628, 11.51480],
                                 borderColor: '#979797', borderWidth: 2, pointRadius: 1
                             }
                         ]
