@@ -181,14 +181,14 @@ export default {
                 this.currentTime = hours + ':' + minutes + ' AM';
             }
 
-            this.highlights = [
-                'landuse' + Math.floor(Math.random() * 252),
-                'landuse' + Math.floor(Math.random() * 252),
-                'landuse' + Math.floor(Math.random() * 252),
-                'landuse' + Math.floor(Math.random() * 252),
-                'landuse' + Math.floor(Math.random() * 252),
-                'landuse' + Math.floor(Math.random() * 252),
-            ];
+            // this.highlights = [
+            //     'landuse' + Math.floor(Math.random() * 252),
+            //     'landuse' + Math.floor(Math.random() * 252),
+            //     'landuse' + Math.floor(Math.random() * 252),
+            //     'landuse' + Math.floor(Math.random() * 252),
+            //     'landuse' + Math.floor(Math.random() * 252),
+            //     'landuse' + Math.floor(Math.random() * 252),
+            // ];
         }
     }
 };
