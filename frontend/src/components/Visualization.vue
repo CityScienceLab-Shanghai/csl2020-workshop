@@ -24,6 +24,10 @@ export default {
         simData: Object,
         step: Number,
         animate: Boolean,
+        highlights: {
+            type: Array,
+            default: () => {return []}
+        }
     },
     data: function () {
         return {
@@ -62,8 +66,19 @@ export default {
             this.currentTime = 0;
         },
 
-        currentMode () {
-            console.log(this.currentMode);
+        highlights () {
+            d3.selectAll('polygon')
+                .attr("fill", "#141414")
+                .attr("stroke", "#303030")
+                .attr("stroke-width", 1);
+
+            for (var boxId of this.highlights) {
+                d3.select('polygon#' + boxId)
+                    .attr("fill", "#46730E")
+                    .attr("stroke", "#89C743")
+                    .attr("stroke-width", 2)
+                    .each(function () { this.parentNode.appendChild(this); });
+            }
         }
     },
     methods: {
@@ -71,12 +86,21 @@ export default {
         drawMap() {
             return new Promise((resolve) => {
                 var path = d3.geoPath().projection(this.projection);
-                var gridUrl = "/geodata/grid80.geojson";
+                var gridUrl = "/geodata/grid.json";
                 var mapUrl = "/geodata/greater_area.geojson";
                 
                 Promise.all([d3.json(gridUrl), d3.json(mapUrl)]).then((results) => {
                     var grid = results[0];
                     var map = results[1];
+
+                    grid = grid.name.map((name, index) => {
+                        return {
+                            name: name,
+                            coords: grid.shape[index].slice(1)
+                        }
+                    })
+
+                    console.log(grid);
 
                     var svg = d3.select(".visualization svg");
                     svg.selectAll("*").remove();
@@ -86,10 +110,20 @@ export default {
                         .attr("fill", "rgb(0, 0, 0)")
                         .attr("stroke", "#303030");
                     
-                    svg.append("path")
-                        .attr("d", path(grid))
+                    svg.append("g")
+                        .attr('id', 'grid')
+                        .selectAll('polygon')
+                        .data(grid)
+                        .enter().append("polygon")
+                        .attr("points", (box) => { 
+                            return box.coords.map((point) => {
+                                return [this.projection(point)[0], this.projection(point)[1]].join(",");
+                            }).join(" ");
+                        })
+                        .attr('id', box => box.name)
                         .attr("fill", "#141414")
-                        .attr("stroke", "#303030");
+                        .attr("stroke", "#303030")
+                        .attr("stroke-location", "inside");
 
                     resolve();
                 });
