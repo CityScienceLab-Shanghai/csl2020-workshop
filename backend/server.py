@@ -1,5 +1,6 @@
 import subprocess
 from flask import Flask, jsonify, request, g
+from flask_cors import CORS
 from xml_utils import *
 from xml.dom.minidom import parse
 import xml.dom.minidom
@@ -36,6 +37,7 @@ class WSGICopyBody(object):
 
 ROOT_PATH = '/home/ubuntu/headless'
 app = Flask(__name__)
+CORS(app)
 pattern_name = re.compile("people[0-9]+")
 pattern_num = re.compile("[0-9]+\.[0-9]+")
 # app.wsgi_app = WSGICopyBody(app.wsgi_app)
@@ -45,6 +47,22 @@ def stringfy(matched):
 
 def floatAccuracyContorl(matched):
     return (f"{round(float(matched.group()), 6)}")
+
+white = ['http://workshop.citysciencelabshanghai.media', 'https://workshop.citysciencelabshanghai.media']
+
+@app.after_request
+def add_cors_headers(response):
+    r = request.referrer[:-1]
+    if r in white:
+        response.headers.add('Access-Control-Allow-Origin', r)
+        response.headers.add('Access-Control-Allow-Credentials', 'true')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Headers', 'Cache-Control')
+        response.headers.add('Access-Control-Allow-Headers', 'X-Requested-With')
+        response.headers.add('Access-Control-Allow-Headers', 'Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
+    return response
+
 
 @app.route('/')
 def check():
