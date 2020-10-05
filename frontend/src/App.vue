@@ -6,6 +6,7 @@
         :animate="animate"
         @time-update="updateCurrentTime(Number.parseInt($event))"/>
         <img class="credit" src="images/credit.png"/>
+        <img class="legends" src="images/legends.png"/>
         <b-container fluid>
             <b-row class="h-100">
                 <b-col class="panel-col">
@@ -18,6 +19,7 @@
                         :simulateApi="simulateApi"
                         :statusApi="statusApi"
                         :resultsApi="resultsApi"
+                        :stopApi="stopApi"
                         :incentive-mode="incentiveMode"
                         @simulation-update="updateSimulationData($event)"
                     />
@@ -112,16 +114,21 @@ export default {
             simulateApi: Config.simulateApi,
             statusApi: Config.statusApi,
             resultsApi: Config.resultsApi,
+            stopApi: Config.stopApi,
+
             nonePanels: Config.nonePanels,
             staticPanels: Config.staticPanels,
             dynamicPanels: Config.dynamicPanels,
             outputPanels: Config.outputPanels,
+
             incentiveModes: Config.incentiveModes,
             incentiveMode: 0,
+
             agentsData: {},
+
             currentStep: 0,
             currentTime: '00:00',
-            animate: true,
+            animate: false,
         };
     },
     methods: {
@@ -152,6 +159,8 @@ export default {
                 }
             }
             this.agentsData = parsedData;
+
+            if (!this.animate) this.animate = true;
         },
 
         updateCurrentTime(time) {
@@ -210,15 +219,6 @@ html, body {
     transform: translateY(-250%);
 }
 
-.panel-col {
-    width: 20%;
-    min-width: 300px;
-    max-width: 350px;
-    height: 100%;
-    overflow-y: auto;
-    padding-bottom: 2em;
-}
-
 .time {
     color: white;
     text-align: center;
@@ -255,12 +255,30 @@ html, body {
     border: 1px solid #979797;
 }
 
+.panel-col {
+    width: 20%;
+    min-width: 300px;
+    max-width: 350px;
+    height: 100%;
+    overflow-y: auto;
+    padding-bottom: 2em;
+}
+
 img.credit {
     position: absolute;
-    width: 17%;
-    min-width: 250px;
+    width: 20%;
+    min-width: 300px;
     max-width: 350px;
     bottom: 1em;
     right: 1em;
+}
+
+img.legends {
+    position: absolute;
+    width: 20%;
+    min-width: 300px;
+    max-width: 350px;
+    bottom: 1.5em;
+    left: 1em;
 }
 </style>

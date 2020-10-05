@@ -9,7 +9,8 @@ function getThemeColor(color, opacity) {
 export default {
     simulateApi: "http://ec2-18-163-189-148.ap-east-1.compute.amazonaws.com:5000/start",
     statusApi: "http://ec2-18-163-189-148.ap-east-1.compute.amazonaws.com:5000/status",
-    resultsApi: "http://ec2-18-163-189-148.ap-east-1.compute.amazonaws.com:5000/debug_result",
+    resultsApi: "http://ec2-18-163-189-148.ap-east-1.compute.amazonaws.com:5000/result",
+    stopApi: "http://ec2-18-163-189-148.ap-east-1.compute.amazonaws.com:5000/stop",
     incentiveModes: ['No incentives', 'Static incentives', 'Dynamic incentives'],
     nonePanels: [
         {
