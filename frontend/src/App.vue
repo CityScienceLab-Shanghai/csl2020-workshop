@@ -127,7 +127,7 @@ export default {
             agentsData: {},
 
             currentStep: 0,
-            currentTime: '00:00',
+            currentTime: '0:00 AM',
             animate: false,
         };
     },
@@ -166,9 +166,14 @@ export default {
         updateCurrentTime(time) {
             var hours = Math.floor(time / 60);
             var minutes = time % 60;
-            hours = hours < 10 ? '0' + hours : '' + hours;
+            // hours = hours < 10 ? '0' + hours : '' + hours;
             minutes = minutes < 10 ? '0' + minutes : '' + minutes;
-            this.currentTime = hours + ':' + minutes;
+
+            if (hours > 12) {
+                this.currentTime = hours - 12 + ':' + minutes + ' PM';
+            } else {
+                this.currentTime = hours + ':' + minutes + ' AM';
+            }
         }
     }
 };
@@ -267,7 +272,7 @@ html, body {
 img.credit {
     position: absolute;
     width: 20%;
-    min-width: 300px;
+    min-width: 200px;
     max-width: 350px;
     bottom: 1em;
     right: 1em;
@@ -276,7 +281,7 @@ img.credit {
 img.legends {
     position: absolute;
     width: 20%;
-    min-width: 300px;
+    min-width: 200px;
     max-width: 350px;
     bottom: 1.5em;
     left: 1em;

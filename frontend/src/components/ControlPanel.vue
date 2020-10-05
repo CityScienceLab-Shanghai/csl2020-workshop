@@ -14,7 +14,8 @@
         
         <b-button-group class="simulation-button">
             <b-button variant="primary" :disabled="running" @click="runSimulation">
-                {{ running ? "Running..." + Math.floor(progress / 60 * 100) + '%' : "Run Simulation" }}
+                {{ running ? status + percent : "Run Simulation" }}
+                <div class="progress-fill" v-if="running" :style="{width: percent}"></div>
             </b-button>
 
             <b-button class="stop" variant="primary" v-if="running" @click="stopSimulation">
@@ -45,6 +46,9 @@ export default {
         return {
             running: false, // Whether the simulation is currently running
             progress: 0,
+            percent: '0%',
+            status: 'Simulating...',
+            maxProgress: 60,
             currentPanel: this.panels[0].name, // Current focused panel. Only show one panel at a time.
             parameters: {},
             heartbeat: null
@@ -66,7 +70,18 @@ export default {
             axios.post(this.simulateApi, this.parameters).then(() => {
                 this.running = true;
                 this.progress = 0;
+                this.percent = '0%';
+                this.status = 'Simulating...';
                 this.startHeartBeat();
+            }).catch((error) => {
+                console.log(error);
+                axios.post(this.simulateApi, this.parameters).then(() => {
+                    this.running = true;
+                    this.progress = 0;
+                    this.percent = '0%';
+                    this.status = 'Simulating...';
+                    this.startHeartBeat();
+                })
             });
         },
 
@@ -77,6 +92,8 @@ export default {
                 console.log(response);
                 this.running = false;
                 this.progress = 0;
+                this.percent = '0%';
+                this.status = 'Simulating...';
                 if (this.heartbeat) {
                     clearInterval(this.heartbeat);
                     this.heartbeat = null;
@@ -89,13 +106,18 @@ export default {
             this.heartbeat = setInterval(() => {
                 axios.get(this.statusApi).then((response) => {
                     console.log(response);
-                    this.progress = Math.min(this.progress + 1, 60);
+                    this.progress = Math.min(this.progress + 1, this.maxProgress - 1);
+                    this.percent = Math.floor(this.progress / this.maxProgress * 100) + '%';
                     if (response.data === 'Terminated') {
-                        this.progress = 60;
+                        this.progress = this.maxProgress - 1;
+                        this.percent = '99%';
+                        this.status = 'Loading results...';
                         this.getResults();
+                        clearInterval(this.heartbeat);
                         setTimeout(() => {
+                            this.progress = this.maxProgress;
+                            this.percent = '100%';
                             this.running = false;
-                            clearInterval(this.heartbeat);
                             this.heartbeat = null;
                         }, 3000);
                     }
@@ -107,7 +129,9 @@ export default {
         getResults() {
             axios.get(this.resultsApi).then((response) => {
                 console.log(response);
-                this.$emit("simulation-update", response.data);
+                if (response.data !== 'GAMA is runninng') {
+                    this.$emit("simulation-update", response.data);
+                }
             });
         },
     },
@@ -144,6 +168,9 @@ export default {
 
         axios.get(this.statusApi).then((response) => {
             console.log(response);
+            if (response.data === 'Running') {
+                this.running = true;
+            }
         });
     }
 };
@@ -153,6 +180,17 @@ export default {
 <style scoped>
 .simulation-button {
     width: 100%;
+}
+
+.progress-fill {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    border-radius: 0.25rem 0 0 0.25rem;
+    background: #004da0;
+    z-index: -1;
+    transition: width 0.3s ease-in-out;
 }
 
 .simulation-button .stop {
