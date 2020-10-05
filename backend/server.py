@@ -52,7 +52,10 @@ white = ['http://workshop.citysciencelabshanghai.media', 'https://workshop.citys
 
 @app.after_request
 def add_cors_headers(response):
-    r = request.referrer[:-1]
+    try:
+        r = request.referrer[:-1]
+    except:
+        return response
     if r in white:
         response.headers.add('Access-Control-Allow-Origin', r)
         response.headers.add('Access-Control-Allow-Credentials', 'true')
@@ -90,10 +93,10 @@ def kill():
                 return "Failed"
     return "No Running Process"
 
-@app.route('/start', methods = ['POST', 'GET'])
+@app.route('/start', methods = ['POST', 'GET', 'OPTIONS'])
 def RunSim():
     global proc
-    if request.method == 'GET':
+    if request.method in ['GET', 'OPTIONS']:
         return 'Please use POST method'
     else:
         body = json.loads(str(request.get_data().decode()))
@@ -104,7 +107,33 @@ def RunSim():
         return str(proc.poll())
 
 @app.route('/result')
-def getResult2():
+def getResult():
+    if checkStatus() == 'Running':
+        return 'GAMA is runninng'
+    DOMTree = xml.dom.minidom.parse(f"{ROOT_PATH}/CSS2020/simulation-outputs1.xml")
+    collection = DOMTree.documentElement
+    Steps = getXMLNode(collection, 'Step')
+    Result = {str(id):{} for id in range(1,13)}
+    for step in Steps:
+        step_result = {}
+        Variables = getXMLNode(step, 'Variable')
+        for v in Variables:
+            value = getNodeValue(v)
+            value = re.sub(pattern_num, floatAccuracyContorl, value)
+            if 'Loc' in getAttrValue(v, 'name'):
+                value = value.replace('location','').replace(';',',')
+            if 'ame' in getAttrValue(v, 'name'):
+                value = re.sub(pattern_name, stringfy, value)
+                value = value.replace('people', '')
+            if 'List' in getAttrValue(v, 'name'):
+                step_result[getAttrValue(v, 'name')] = json.loads(value)
+            else:
+                step_result[getAttrValue(v, 'name')] = value
+        Result[getAttrValue(step, 'id')] = step_result
+    return jsonify(Result)
+
+@app.route('/debug_result_full')
+def getResult_debug_full():
     DOMTree = xml.dom.minidom.parse(f"{ROOT_PATH}/CSS2020/simulation-outputs1.xml")
     collection = DOMTree.documentElement
     Steps = getXMLNode(collection, 'Step')
@@ -133,8 +162,8 @@ def startSim():
     print(status, output)
     return output
 
-@app.route('/debug_result')
-def getResult():
+@app.route('/debug_result_part')
+def getResult_debug_part():
     DOMTree = xml.dom.minidom.parse(f"{ROOT_PATH}/CSS2020/simulation-outputs1.xml")
     collection = DOMTree.documentElement
     Steps = getXMLNode(collection, 'Step')
