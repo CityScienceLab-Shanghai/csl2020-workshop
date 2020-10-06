@@ -6,8 +6,8 @@
     >
         <b-form-input 
             id="range-1" type="range"
-            :min="min"
-            :max="max" 
+            min="0"
+            max="1" 
             :step="step"
             :disabled="disabled"
             v-model="value"
@@ -46,11 +46,19 @@ export default {
             value: this.default
         };
     },
-    watch: {
-        value (data) {
-            this.$emit('slider-change', this.id, data);
+    computed: {
+        mappedValue () {
+            return Number.parseFloat(this.value).map(0, 1, this.min, this.max);
         }
     },
+    watch: {
+        value () {
+            this.$emit('slider-change', this.id, this.mappedValue);
+        }
+    },
+    mounted () {
+        this.$emit('slider-change', this.id, this.mappedValue);
+    }
 };
 </script>
 

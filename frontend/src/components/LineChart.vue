@@ -17,7 +17,10 @@ export default {
                     labels: {
                         boxWidth: 10,
                         fontSize: 10,
-                        fontColor: 'white'
+                        fontColor: 'white',
+                        filter: function(item) {
+                            return !item.text.includes('Danger Zone');
+                        }
                     }
                 }
             }

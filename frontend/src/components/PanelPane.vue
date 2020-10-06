@@ -1,14 +1,11 @@
 <template>
     <b-card
-        class="mb-2"
-        :title="name"
-        :sub-title="description"
-        @mouseenter="$emit('mouse-entered')"
-        @click="$emit('mouse-entered')"
-    >
-        <b-collapse
-            :visible="visible"
-        >
+    class="mb-2"
+    :title="name"
+    :sub-title="description"
+    @mouseenter="$emit('mouse-entered')"
+    @click="$emit('mouse-entered')" >
+        <b-collapse :visible="visible">
             <Slider
                 v-for="control in controls"
                 :key="control.id"
@@ -24,12 +21,17 @@
 
             <div v-for="chart in charts" :key="chart.id">
                 <b v-if="chart.title" style="font-size: 1em;">{{chart.title}}</b>
+                <b v-if="chart.indicator" style="font-size: 1em; color: gray;">{{chart.indicator}}</b>
                 <Chart
                     :type="chart.type"
                     :chart-data="chart.data"
                 ></Chart>
             </div>
         </b-collapse>
+
+        <div :style="{ opacity: !visible ? 1.0 : 0.0}" style="text-align: center; transition: opacity 0.5s;">
+            <b-icon-chevron-compact-down font-scale="1.5"></b-icon-chevron-compact-down>
+        </div>
     </b-card>
 </template>
 
@@ -62,7 +64,7 @@ export default {
     },
     mounted () {
         for (var control of this.controls) {
-            this.parameters[control.id] = control.default;
+            this.parameters[control.id] = control.default.map(0, 1, control.min, control.max);
         }
     }
 };
@@ -77,7 +79,7 @@ export default {
 .card-body {
     background: black;
     border: 1px solid #979797;
-    border-radius: 5px;
+    border-radius: 0.25rem;
     font-size: 0.9em !important;
     color: white;
 }
