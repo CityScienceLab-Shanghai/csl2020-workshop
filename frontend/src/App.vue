@@ -156,7 +156,7 @@ export default {
         updateSimulationData (data) {
             this.outputPanels[0].charts[0].data = makeRadarChartData(data);
             var chartData = makeLineChartsData(data);
-            for (var chartId in this.outputPanels[1].charts) {
+            for (var chartId in chartData) {
                 this.outputPanels[1].charts[chartId].data = chartData[chartId];
             }
             this.updateAgentsData(data);
