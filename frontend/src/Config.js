@@ -7,6 +7,11 @@ function getThemeColor(color, opacity) {
 }
 
 export default {
+    // simulateApi: "http://workshop.citysciencelabshanghai.media/api/start",
+    // statusApi: "http://workshop.citysciencelabshanghai.media/api/status",
+    // resultsApi: "http://workshop.citysciencelabshanghai.media/api/result",
+    // stopApi: "http://workshop.citysciencelabshanghai.media/api/stop",
+
     simulateApi: "/api/start",
     statusApi: "/api/status",
     resultsApi: "/api/result",
@@ -21,7 +26,7 @@ export default {
     ],
     staticPanels: [
         {
-            name: "Static incentives",
+            name: "Static incentive strength",
             description: "Manually set incentives for the neighborhood.",
             controls: [
                 {
@@ -82,38 +87,6 @@ export default {
             ],
             charts: []
         },
-        // {
-        //     name: "Calculated incentives",
-        //     description: "Incentives as calculated by the optimization algorithm. You can switch back to static mode to edit these parameters.",
-        //     controls: [
-        //         {
-        //             id: "construction_intensity",
-        //             name: "Construction intensity",
-        //             min: 0, max: 1, default: 1, disabled: true
-        //         },
-        //         // {
-        //         //     id: "rent_discount_ratio_all",
-        //         //     name: "Overall rent discount",
-        //         //     min: 0.1, max: 1, default: 1, disabled: true
-        //         // },
-        //         {
-        //             id: "rent_discount_ratio_low_inc",
-        //             name: "Low income",
-        //             min: 0.1, max: 1, default: 1, disabled: true
-        //         },
-        //         {
-        //             id: "rent_discount_ratio_less_commuting",
-        //             name: "Less commuting",
-        //             min: 0.1, max: 1, default: 1, disabled: true
-        //         },
-        //         {
-        //             id: "rent_discount_ratio_small_scale",
-        //             name: "Small-scale housing",
-        //             min: 0.1, max: 1, default: 1, disabled: true
-        //         }
-        //     ],
-        //     charts: []
-        // },
     ],
 
     outputPanels: [
@@ -182,7 +155,8 @@ export default {
                                 data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                                 fill: 'start',
                                 backgroundColor: "rgba(255, 0, 0, 0.2)",
-                                borderWidth: 0, pointRadius: 0
+                                borderColor: "rgba(255, 0, 0, 0.5)",
+                                borderWidth: 1, pointRadius: 0
                             },
                         ]
                     }
@@ -229,7 +203,7 @@ export default {
                         datasets: [
                             { 
                                 label: 'Diversity', 
-                                key: 'kendall_diversity.crt_total_pop',
+                                key: 'kendall_diversity',
                                 data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                                 fill: false,
                                 borderColor: '#428FFD', borderWidth: 2, pointRadius: 1
