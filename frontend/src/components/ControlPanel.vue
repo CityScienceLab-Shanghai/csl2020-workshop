@@ -145,6 +145,7 @@ export default {
 
         // Get simulation results and publish an event to update all data
         getResults() {
+            // axios.get('result.json', {
             axios.get(this.resultsApi, {
                 jar: cookieJar,
                 withCredentials: true,

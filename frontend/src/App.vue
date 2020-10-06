@@ -1,3 +1,10 @@
+// TODO: Remove all value mapping, except for radar chart (0...1 => 0...100)
+// TODO: Radar chart add last time history and goals
+// TODO: Add a line chart showing the change in three policies in dynamic mode
+// TODO: Bind to Can's grid and dynamic policy data
+// TODO: Add favicon
+// TODO: Smaller screens?
+
 <template>
     <div id="app">
         <Visualization 
@@ -14,9 +21,10 @@
                     <img style="width: 100%;" src="images/legends.png"/>
                 </b-col>
                 <b-col align-self="end">
-                    <DynamicPolicy v-if="incentiveMode === 2" class="w-80"/>
+                    <DynamicPolicy v-if="incentiveMode === 2" class="w-80"
+                    :step="currentStep"/>
                     <div id="slider">
-                        <b-input-group :prepend="'Simulation step: ' + (currentStep + 1)" class="mt-3">
+                        <b-input-group :prepend="'Simulation step: ' + currentStep" class="mt-3">
                             <b-form-input type="range" min="0" max="12" value="12" 
                             @change="currentStep = Number.parseInt($event)"></b-form-input>
                         </b-input-group>
@@ -105,6 +113,7 @@ function makeLineChartsData (sourceData) {
 
         for (var datasetId in Config.outputPanels[1].charts[chartId].data.datasets) {
             var datasetKey = Config.outputPanels[1].charts[chartId].data.datasets[datasetId].key;
+            if (!datasetKey) continue;
             data.datasets[datasetId].data = [];
             for (var i = 0; i <= 12; i++) {
                 data.datasets[datasetId].data.push(
