@@ -27,7 +27,8 @@ export default {
         highlights: {
             type: Array,
             default: () => {return []}
-        }
+        },
+        mapData: Array
     },
     data: function () {
         return {
@@ -47,11 +48,13 @@ export default {
             return d3.geoMercator()
                 .center([-71.0865450, 42.3672538])
                 .scale(1500000)
-                .translate([this.width / 2, this.height / 2]);
+                .translate([this.width / 2 - this.width / 20, this.height / 2]);
         }
     },
     watch: {
         step () {
+            this.currentTime = 0;
+            if (!this.simData[this.step]) return;   // No data loaded yet.
             this.dataset = this.simData[this.step];
             this.updateDataset();
             this.bindAgents();
@@ -79,55 +82,52 @@ export default {
                     .attr("stroke-width", 2)
                     .each(function () { this.parentNode.appendChild(this); });
             }
+        },
+
+        mapData () {
+            this.drawMap();
+            this.bindAgents();
+            this.drawAgents();
         }
     },
     methods: {
 
         drawMap() {
-            return new Promise((resolve) => {
-                var path = d3.geoPath().projection(this.projection);
-                var gridUrl = "/geodata/grid.json";
-                var mapUrl = "/geodata/greater_area.geojson";
-                
-                Promise.all([d3.json(gridUrl), d3.json(mapUrl)]).then((results) => {
-                    var grid = results[0];
-                    var map = results[1];
+            if (this.mapData.length < 2) return;    // Haven't finished loading.
 
-                    grid = grid.name.map((name, index) => {
-                        return {
-                            name: name,
-                            coords: grid.shape[index].slice(1)
-                        }
-                    })
+            var path = d3.geoPath().projection(this.projection);
+            var grid = this.mapData[0];
+            var map = this.mapData[1];
 
-                    console.log(grid);
-
-                    var svg = d3.select(".visualization svg");
-                    svg.selectAll("*").remove();
-
-                    svg.append("path")
-                        .attr("d", path(map))
-                        .attr("fill", "rgb(0, 0, 0)")
-                        .attr("stroke", "#303030");
-                    
-                    svg.append("g")
-                        .attr('id', 'grid')
-                        .selectAll('polygon')
-                        .data(grid)
-                        .enter().append("polygon")
-                        .attr("points", (box) => { 
-                            return box.coords.map((point) => {
-                                return [this.projection(point)[0], this.projection(point)[1]].join(",");
-                            }).join(" ");
-                        })
-                        .attr('id', box => box.name)
-                        .attr("fill", "#141414")
-                        .attr("stroke", "#303030")
-                        .attr("stroke-location", "inside");
-
-                    resolve();
-                });
+            grid = grid.name.map((name, index) => {
+                return {
+                    name: name,
+                    coords: grid.shape[index].slice(1)
+                }
             })
+
+            var svg = d3.select(".visualization svg");
+            svg.selectAll("*").remove();
+
+            svg.append("path")
+                .attr("d", path(map))
+                .attr("fill", "rgb(0, 0, 0)")
+                .attr("stroke", "#303030");
+            
+            svg.append("g")
+                .attr('id', 'grid')
+                .selectAll('polygon')
+                .data(grid)
+                .enter().append("polygon")
+                .attr("points", (box) => { 
+                    return box.coords.map((point) => {
+                        return [this.projection(point)[0], this.projection(point)[1]].join(",");
+                    }).join(" ");
+                })
+                .attr('id', box => box.name)
+                .attr("fill", "#141414")
+                .attr("stroke", "#303030")
+                .attr("stroke-location", "inside");
         },
 
         bindAgents() {
@@ -237,26 +237,21 @@ export default {
             this.width = window.innerWidth;
             this.height = window.innerHeight;
             
-            this.drawMap().then(() => {
-                this.updateDataset();
-                var vis = d3.select(this.customBase);
-                vis.selectAll("custom.circle")
-                    .interrupt()
-                    .data(this.dataset)
-                    .attr("x", (d) => {
-                        return this.projection(d._coord)[0];
-                    })
-                    .attr("y", (d) => {
-                        return this.projection(d._coord)[1];
-                    })
-                this.drawAgents();
-            });
-        }));
-        
-        this.drawMap().then(() => {
-            this.bindAgents();
+            this.drawMap();
+
+            this.updateDataset();
+            var vis = d3.select(this.customBase);
+            vis.selectAll("custom.circle")
+                .interrupt()
+                .data(this.dataset)
+                .attr("x", (d) => {
+                    return this.projection(d._coord)[0];
+                })
+                .attr("y", (d) => {
+                    return this.projection(d._coord)[1];
+                })
             this.drawAgents();
-        });
+        }));
 
         setInterval(() => {
             if (this.animate) {

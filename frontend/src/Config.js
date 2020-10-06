@@ -7,10 +7,10 @@ function getThemeColor(color, opacity) {
 }
 
 export default {
-    simulateApi: "http://ec2-18-163-189-148.ap-east-1.compute.amazonaws.com:5000/start",
-    statusApi: "http://ec2-18-163-189-148.ap-east-1.compute.amazonaws.com:5000/status",
-    resultsApi: "http://ec2-18-163-189-148.ap-east-1.compute.amazonaws.com:5000/result",
-    stopApi: "http://ec2-18-163-189-148.ap-east-1.compute.amazonaws.com:5000/stop",
+    simulateApi: "/api/start",
+    statusApi: "/api/status",
+    resultsApi: "/api/result",
+    stopApi: "/api/stop",
     incentiveModes: ['No incentives', 'Static incentives', 'Dynamic incentives'],
     nonePanels: [
         {
@@ -37,17 +37,17 @@ export default {
                 {
                     id: "rent_discount_ratio_low_inc",
                     name: "Low income",
-                    min: 0.1, max: 1, default: 1, disabled: false
+                    min: 1, max: 0.5, default: 0, disabled: false
                 },
                 {
                     id: "rent_discount_ratio_less_commuting",
                     name: "Less commuting",
-                    min: 0.1, max: 1, default: 1, disabled: false
+                    min: 1, max: 0.5, default: 0, disabled: false
                 },
                 {
                     id: "rent_discount_ratio_small_scale",
                     name: "Small-scale housing",
-                    min: 0.1, max: 1, default: 1, disabled: false
+                    min: 1, max: 0.5, default: 0, disabled: false
                 }
             ],
             charts: []
@@ -60,24 +60,24 @@ export default {
             description: "Set goals for the equity and environmental impact of the neighborhood, and have the algorithm find optimized dynamic incentives.",
             controls: [
                 {
-                    id: "diversity_target",
-                    name: "Diversity",
-                    min: 0.2, max: 0.7, default: 0.7, disabled: false
-                },
-                {
                     id: "low_inc_pop_ratio_target",
                     name: "Affordability",
-                    min: 0.1, max: 0.7, default: 0.5, disabled: false
+                    min: 0.35, max: 0.65, default: 0.5, disabled: false
+                },
+                {
+                    id: "diversity_target",
+                    name: "Diversity",
+                    min: 0.62, max: 0.7, default: 0.5, disabled: false
                 },
                 {
                     id: "commute_distance_target",
-                    name: "Commute energy consumption",
-                    min: 1.0, max: 3.5, default: 2, disabled: false
+                    name: "Commute energy efficiency",
+                    min: 0, max: 0.6, default: 0.5, disabled: false
                 },
                 {
                     id: "building_energy_target",
-                    name: "Building energy consumption",
-                    min: 40, max: 80, default: 40, disabled: false
+                    name: "Building energy efficiency",
+                    min: 60, max: 50, default: 0.5, disabled: false
                 }
             ],
             charts: []
@@ -146,7 +146,7 @@ export default {
         },
         {
             name: "Detailed information",
-            description: "Here you can find the change of various indicators as time goes by, including developer finance, commute distance, population, and energy consumption.",
+            description: "Here you can find the change of various indicators as time goes by, such as developer finance, population, and energy consumption.",
             controls: [],
             charts: [
                 {
@@ -168,38 +168,29 @@ export default {
                                 key: 'the_developer.expenditure_total',
                                 data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                                 fill: false,
-                                borderColor: '#D7A207', borderWidth: 2, pointRadius: 1
+                                borderColor: 'rgba(215,162,7,0.5)', borderWidth: 2, pointRadius: 1
                             },
                             { 
                                 label: 'Revenue', 
                                 key: 'the_developer.revene_total',
                                 data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                                 fill: false,
-                                borderColor: '#7ED321', borderWidth: 2, pointRadius: 1
-                            }
-                        ]
-                    }
-                },
-                {
-                    id: "commute-distance",
-                    title: "Decrease in commute distance",
-                    type: "line",
-                    data: {
-                        labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
-                        datasets: [
+                                borderColor: 'rgba(126,211,33,0.5)', borderWidth: 2, pointRadius: 1
+                            },
                             { 
-                                label: 'Mean distance', 
-                                key: 'commute_distance_decrease',
+                                label: 'Danger Zone', 
                                 data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                                fill: false,
-                                borderColor: '#428FFD', borderWidth: 2, pointRadius: 1
-                            }
+                                fill: 'start',
+                                backgroundColor: "rgba(255, 0, 0, 0.2)",
+                                borderWidth: 0, pointRadius: 0
+                            },
                         ]
                     }
                 },
                 {
                     id: "population",
                     title: "Population",
+                    indicator: " (Affordability)",
                     type: "line",
                     data: {
                         labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
@@ -229,8 +220,45 @@ export default {
                     }
                 },
                 {
+                    id: "diversity",
+                    title: "Population Diversity",
+                    indicator: " (Diversity)",
+                    type: "line",
+                    data: {
+                        labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+                        datasets: [
+                            { 
+                                label: 'Diversity', 
+                                key: 'kendall_diversity.crt_total_pop',
+                                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                fill: false,
+                                borderColor: '#428FFD', borderWidth: 2, pointRadius: 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    id: "commute-distance",
+                    title: "Decrease in commute distance",
+                    indicator: " (Commute energy efficiency)",
+                    type: "line",
+                    data: {
+                        labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+                        datasets: [
+                            { 
+                                label: 'Decrease in distance', 
+                                key: 'commute_distance_decrease',
+                                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                fill: false,
+                                borderColor: '#428FFD', borderWidth: 2, pointRadius: 1
+                            }
+                        ]
+                    }
+                },
+                {
                     id: "energy",
                     title: "Residence energy consumption",
+                    indicator: " (Building energy efficiency)",
                     type: "line",
                     data: {
                         labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],

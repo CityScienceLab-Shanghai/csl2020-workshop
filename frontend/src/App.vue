@@ -5,12 +5,32 @@
         :step="currentStep" 
         :animate="animate"
         :highlights="highlights"
+        :map-data="mapData"
         @time-update="updateCurrentTime(Number.parseInt($event))"/>
-        <img class="credit" src="images/credit.png"/>
-        <img class="legends" src="images/legends.png"/>
-        <b-container fluid>
+
+        <b-container fluid id="bottom-container">
+            <b-row align-v="end" class="h-100" >
+                <b-col cols="3" class="panel-col" align-self="end">
+                    <img style="width: 100%;" src="images/legends.png"/>
+                </b-col>
+                <b-col align-self="end">
+                    <DynamicPolicy v-if="incentiveMode === 2" class="w-80"/>
+                    <div id="slider">
+                        <b-input-group :prepend="'Simulation step: ' + (currentStep + 1)" class="mt-3">
+                            <b-form-input type="range" min="0" max="12" value="12" 
+                            @change="currentStep = Number.parseInt($event)"></b-form-input>
+                        </b-input-group>
+                    </div>
+                </b-col>
+                <b-col cols="3" class="output-col" align-self="end">
+                    <img style="width: 100%;" src="images/credit.png"/>
+                </b-col>
+            </b-row>
+        </b-container>
+
+        <b-container fluid style="pointer-events: none;">
             <b-row class="h-100">
-                <b-col class="panel-col">
+                <b-col cols="3" class="panel-col h-100" style="pointer-events: auto; padding-bottom: 2em;">
                     <IncentivePanel
                         :incentive-modes="incentiveModes"
                         :current-mode="incentiveMode"
@@ -26,7 +46,7 @@
                     />
                 </b-col>
                 <b-col>
-                    <div class="time">
+                    <div class="time" style="pointer-events: auto;">
                         <div class="time-title">Time of the day</div>
                         <div class="time-text" @click="animate = !animate">
                             {{ currentTime }}
@@ -35,22 +55,12 @@
                         </div>
                     </div>
                 </b-col>
-                <b-col cols="3" class="output-col">
+                <b-col cols="3" class="output-col h-100" style="pointer-events: auto; padding-bottom: 2em;">
                     <OutputPanel :panels="outputPanels" />
                 </b-col>
             </b-row>
-            <b-row align-v="end">
-                <b-col cols="3"></b-col>
-                <b-col cols="6">
-                    <div id="slider">
-                        <b-input-group :prepend="'Simulation step: ' + (currentStep + 1)" class="mt-3">
-                            <b-form-input type="range" min="0" max="12" value="0" 
-                            @change="currentStep = Number.parseInt($event)"></b-form-input>
-                        </b-input-group>
-                    </div>
-                </b-col>
-            </b-row>
         </b-container>
+        
     </div>
 </template>
 
@@ -63,10 +73,13 @@ Vue.use(IconsPlugin);
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 
+import axios from "axios";
+
 import IncentivePanel from "./components/IncentivePanel.vue";
 import ControlPanel from "./components/ControlPanel.vue";
 import Visualization from "./components/Visualization.vue";
 import OutputPanel from "./components/OutputPanel.vue";
+import DynamicPolicy from "./components/DynamicPolicy.vue";
 
 import Config from "./Config.js";
 
@@ -77,10 +90,10 @@ Number.prototype.map = function (in_min, in_max, out_min, out_max) {
 function makeRadarChartData (sourceData) {
     var data = {...Config.outputPanels[0].charts[0].data}
     data.datasets[0].data = [
-        Number.parseFloat(sourceData[12]['kendall_low_inc_ratio']).map(0.35, 0.5, 0, 100), 
-        Number.parseFloat(sourceData[12]['kendall_diversity']).map(0.62, 0.7, 0, 100), 
-        Number.parseFloat(sourceData[12]['residence_energy_per_person']).map(54, 60, 100, 0),
-        Number.parseFloat(sourceData[12]['commute_distance_decrease']).map(-0.05, 0.3, 0, 100)
+        Number.parseFloat(sourceData[12]['kendall_low_inc_ratio']).map(0.35, 0.65, 0, 100), 
+        Number.parseFloat(sourceData[12]['kendall_diversity']).map(0.62, 0.694, 0, 100), 
+        Number.parseFloat(sourceData[12]['residence_energy_per_person']).map(50, 60, 100, 0),
+        Number.parseFloat(sourceData[12]['commute_distance_decrease']).map(-0.1, 0.6, 0, 100)
     ];
     return data;
 }
@@ -112,7 +125,8 @@ export default {
         IncentivePanel,
         ControlPanel,
         Visualization,
-        OutputPanel
+        OutputPanel,
+        DynamicPolicy
     },
     data: function () {
         return {
@@ -129,10 +143,11 @@ export default {
             incentiveModes: Config.incentiveModes,
             incentiveMode: 0,
 
+            mapData: [],
             agentsData: {},
             highlights: [],
 
-            currentStep: 0,
+            currentStep: 12,
             currentTime: '0:00 AM',
             animate: false,
         };
@@ -180,16 +195,17 @@ export default {
             } else {
                 this.currentTime = hours + ':' + minutes + ' AM';
             }
-
-            // this.highlights = [
-            //     'landuse' + Math.floor(Math.random() * 252),
-            //     'landuse' + Math.floor(Math.random() * 252),
-            //     'landuse' + Math.floor(Math.random() * 252),
-            //     'landuse' + Math.floor(Math.random() * 252),
-            //     'landuse' + Math.floor(Math.random() * 252),
-            //     'landuse' + Math.floor(Math.random() * 252),
-            // ];
         }
+    },
+    mounted () {
+        var gridUrl = "/geodata/grid.json";
+        var mapUrl = "/geodata/greater_area.geojson";
+        
+        Promise.all([axios.get(gridUrl), axios.get(mapUrl)]).then((results) => {
+            this.mapData = [
+                results[0].data, results[1].data
+            ]
+        });
     }
 };
 </script>
@@ -235,10 +251,6 @@ html, body {
     padding-bottom: 0.25rem;
 }
 
-#slider {
-    transform: translateY(-250%);
-}
-
 .time {
     color: white;
     text-align: center;
@@ -279,33 +291,24 @@ html, body {
     width: 20%;
     min-width: 300px;
     max-width: 350px;
-    height: 100%;
     overflow-y: auto;
-    padding-bottom: 2em;
 }
 
 .output-col {
     min-width: 350px;
-    height: 100%;
     overflow-y: auto;
-    padding-bottom: 2em;
 }
 
 img.credit {
-    position: absolute;
-    width: 20%;
-    min-width: 200px;
-    max-width: 350px;
-    bottom: 1em;
-    right: 1em;
+    width: 100%;
 }
 
 img.legends {
-    position: absolute;
-    width: 20%;
-    min-width: 200px;
-    max-width: 350px;
-    bottom: 1.5em;
-    left: 1em;
+    width: 100%;
 }
+
+#bottom-container {
+    bottom: 1.5em;
+}
+
 </style>

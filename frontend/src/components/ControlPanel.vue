@@ -27,9 +27,15 @@
 
 <script>
 import axios from "axios";
+import axiosCookieJarSupport from "axios-cookiejar-support";
+import tough from "tough-cookie";
+
 import PanelPane from './PanelPane.vue';
 
+axiosCookieJarSupport(axios);
 axios.defaults.withCredentials = true;
+
+const cookieJar = new tough.CookieJar();
 
 export default {
     name: "ControlPanel",
@@ -69,7 +75,10 @@ export default {
             console.log("Running simulation");
             console.log(this.parameters);
 
-            axios.post(this.simulateApi, this.parameters).then(() => {
+            axios.post(this.simulateApi, this.parameters, {
+                jar: cookieJar,
+                withCredentials: true,
+            }).then(() => {
                 this.running = true;
                 this.progress = 0;
                 this.percent = '0%';
@@ -90,7 +99,10 @@ export default {
         stopSimulation() {
             console.log('Stopping simulation');
 
-            axios.get(this.stopApi).then((response) => {
+            axios.get(this.stopApi, {
+                jar: cookieJar,
+                withCredentials: true,
+            }).then((response) => {
                 console.log(response);
                 this.running = false;
                 this.progress = 0;
@@ -104,7 +116,10 @@ export default {
         },
 
         heartbeatHandler () {
-            axios.get(this.statusApi).then((response) => {
+            axios.get(this.statusApi, {
+                jar: cookieJar,
+                withCredentials: true,
+            }).then((response) => {
                 console.log(response);
                 this.progress = Math.min(this.progress + 1, this.maxProgress - 1);
                 this.percent = Math.floor(this.progress / this.maxProgress * 100) + '%';
@@ -130,7 +145,10 @@ export default {
 
         // Get simulation results and publish an event to update all data
         getResults() {
-            axios.get(this.resultsApi).then((response) => {
+            axios.get(this.resultsApi, {
+                jar: cookieJar,
+                withCredentials: true,
+            }).then((response) => {
                 console.log(response);
                 if (response.data !== 'GAMA is runninng') {
                     this.$emit("simulation-update", response.data);
@@ -165,7 +183,7 @@ export default {
     mounted () {
         for (var panel of this.panels) {
             for (var control of panel.controls) {
-                this.parameters[control.id] = control.default;
+                this.parameters[control.id] = control.default.map(0, 1, control.min, control.max);
             }
         }
         this.parameters['incentive_policy'] = false;
@@ -175,6 +193,10 @@ export default {
             console.log(response);
             if (response.data === 'Running') {
                 this.running = true;
+                this.progress = 0;
+                this.percent = '0%';
+                this.status = 'Simulating...';
+                this.startHeartBeat();
             }
         });
     }
