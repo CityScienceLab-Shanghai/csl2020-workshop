@@ -1,13 +1,14 @@
 import subprocess
-from flask import Flask, jsonify, request, g
+from flask import Flask, jsonify, request, g, session
 from flask_cors import CORS
 from xml_utils import *
 from xml.dom.minidom import parse
 import xml.dom.minidom
 from xmlTemplate import getXML
-import json, re, os, signal
+import json, re, os, signal, random, string
+from datetime import timedelta
 
-proc = None
+proc = {}
 
 class WSGICopyBody(object):
     def __init__(self, application):
@@ -38,6 +39,10 @@ class WSGICopyBody(object):
 ROOT_PATH = '/home/ubuntu/headless'
 app = Flask(__name__)
 CORS(app)
+
+app.config['SECRET_KEY'] = os.urandom(24)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=2)
+
 pattern_name = re.compile("people[0-9]+")
 pattern_num = re.compile("[0-9]+\.[0-9]+")
 # app.wsgi_app = WSGICopyBody(app.wsgi_app)
@@ -47,6 +52,9 @@ def stringfy(matched):
 
 def floatAccuracyContorl(matched):
     return (f"{round(float(matched.group()), 6)}")
+
+def getRandomString(length):
+    return ''.join(random.sample(string.ascii_letters + string.digits, length))
 
 white = ['http://workshop.citysciencelabshanghai.media', 'https://workshop.citysciencelabshanghai.media']
 
@@ -71,11 +79,59 @@ def add_cors_headers(response):
 def check():
     return 'OK'
 
+def haveSession(session=session):
+    if 'sid' in session:
+        return True
+    else:
+        return False
+
+def getSession(session=session):
+    if haveSession(session):
+        print(session.get('sid'))
+        p = session.get('sid')
+        return f'{p}'
+    else:
+        session['sid'] = getRandomString(8)
+        print(session.get('sid'))
+        p = session.get('sid')
+        return f'{p}'
+
+@app.route('/get_session')
+def getSession_debug(session=session):
+    if haveSession(session):
+        print(session.get('sid'))
+        p = session.get('sid')
+        return f'SSID: {p}'
+    else:
+        session['sid'] = getRandomString(8)
+        print(session.get('sid'))
+        p = session.get('sid')
+        return f'New SSID: {p}'
+
+@app.route('/clear_session')
+def clearSession_debug(session=session):
+    if haveSession(session):
+        try:
+            print(session.get('sid'))
+            p = session.get('sid')
+            session.pop('sid')
+            return f'SSID {p} Cleared'
+        except:
+            return f'Session Clear Failed'
+    return f'No Session to clear yet'
+
+@app.route('/get_proc')
+def getProc():
+    global proc
+    resp_dict = {'None':'Running', '0':'Ends Normally', '1':'Sleep', '2':'Process doesnt exsit', '-15':'Kill'}
+    return str({k:[v, resp_dict[str(v.poll())]] for k,v in proc.items()})
+
 @app.route('/status')
 def checkStatus():
     global proc
-    if proc:
-        if proc.poll() is None:
+    sid = getSession()
+    if sid in proc.keys():
+        if proc[sid].poll() is None:
             return "Running"
         return "Terminated"
     else:
@@ -84,10 +140,10 @@ def checkStatus():
 @app.route('/stop')
 def kill():
     global proc
-    if proc:
-        if proc.poll() is None:
+    if getSession() in proc.keys():
+        if proc[getSession()].poll() is None:
             try:
-                os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+                os.killpg(os.getpgid(proc[getSession()].pid), signal.SIGTERM)
                 return "Killed"
             except:
                 return "Failed"
@@ -96,21 +152,24 @@ def kill():
 @app.route('/start', methods = ['POST', 'GET', 'OPTIONS'])
 def RunSim():
     global proc
+    sid = getSession()
     if request.method in ['GET', 'OPTIONS']:
         return 'Please use POST method'
     else:
         body = json.loads(str(request.get_data().decode()))
-        with open(f"{ROOT_PATH}/CSS2020.xml","w") as f:
+        body['id'] = sid
+        with open(f"{ROOT_PATH}/plans/CSS2020_{sid}.xml","w") as f:
             f.write(getXML(**body))
-        proc = subprocess.Popen(['bash', f'{ROOT_PATH}/gama-headless.sh', f'{ROOT_PATH}/CSS2020.xml', f'{ROOT_PATH}/CSS2020'], stdout=subprocess.PIPE, preexec_fn=os.setsid)
-        print(proc.poll())
-        return str(proc.poll())
+        proc[sid] = subprocess.Popen(['bash', f'{ROOT_PATH}/gama-headless.sh', f'{ROOT_PATH}/plans/CSS2020_{sid}.xml', f'{ROOT_PATH}/CSS2020'], stdout=subprocess.PIPE, preexec_fn=os.setsid)
+        print(proc[sid].poll())
+        return str(proc[sid].poll())
 
 @app.route('/result')
 def getResult():
     if checkStatus() == 'Running':
         return 'GAMA is runninng'
-    DOMTree = xml.dom.minidom.parse(f"{ROOT_PATH}/CSS2020/simulation-outputs1.xml")
+    sid = getSession()
+    DOMTree = xml.dom.minidom.parse(f"{ROOT_PATH}/CSS2020/simulation-outputs{sid}.xml")
     collection = DOMTree.documentElement
     Steps = getXMLNode(collection, 'Step')
     Result = {str(id):{} for id in range(1,13)}
