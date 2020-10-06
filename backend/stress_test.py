@@ -2,7 +2,7 @@ import subprocess, time, _thread, argparse
 
 proc = None
 
-ROOT_PATH = '/home/ubuntu/headless'
+ROOT_PATH = '/home/ubuntu/GAMA/headless'
 
 def test(id):
     print(f'GAMA No.{id} Started')

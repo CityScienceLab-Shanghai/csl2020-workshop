@@ -9,7 +9,7 @@ defaultValue['id'] = '1'
 
 t = string.Template("""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Experiment_plan>
-	<Simulation id="${id}" sourcePath="/home/ubuntu/Model/models/workshop.gaml" finalStep="13" experiment="gui">
+	<Simulation id="${id}" sourcePath="/home/ubuntu/csl2020-workshop/backend/backend-gama/models/workshop.gaml" finalStep="13" experiment="gui">
 	  <Parameters>
 	  	<Parameter name="construction_intensity" type="FLOAT" value="${construction_intensity}" />
 		<Parameter name="rent_discount_ratio_all" type="FLOAT" value="${rent_discount_ratio_all}" />

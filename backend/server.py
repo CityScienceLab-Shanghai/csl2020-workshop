@@ -7,6 +7,9 @@ import xml.dom.minidom
 from xmlTemplate import getXML
 import json, re, os, signal, random, string
 from datetime import timedelta
+from redis import Redis, ConnectionPool
+import pickle
+import logging
 
 proc = {}
 
@@ -36,9 +39,15 @@ class WSGICopyBody(object):
             start_response(status, headers, exc_info)
         return callback
 
-ROOT_PATH = '/home/ubuntu/headless'
+ROOT_PATH = '/home/ubuntu/GAMA/headless'
 app = Flask(__name__)
 CORS(app)
+
+# pool = ConnectionPool(host='', port=6379)
+# r = Redis(connection_pool=pool)
+
+# app.config['SESSION_TYPE'] = 'redis'
+# app.config['SESSION_REDIS'] = r
 
 app.config['SECRET_KEY'] = os.urandom(24)
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=2)
@@ -251,3 +260,7 @@ def getResult_debug_part():
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug = True, port=5000)
 
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
