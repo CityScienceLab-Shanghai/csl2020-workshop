@@ -4,6 +4,7 @@
         :sim-data="agentsData"
         :step="currentStep" 
         :animate="animate"
+        :highlights="highlights"
         @time-update="updateCurrentTime(Number.parseInt($event))"/>
         <img class="credit" src="images/credit.png"/>
         <img class="legends" src="images/legends.png"/>
@@ -129,6 +130,7 @@ export default {
             incentiveMode: 0,
 
             agentsData: {},
+            highlights: [],
 
             currentStep: 0,
             currentTime: '0:00 AM',
@@ -178,6 +180,15 @@ export default {
             } else {
                 this.currentTime = hours + ':' + minutes + ' AM';
             }
+
+            // this.highlights = [
+            //     'landuse' + Math.floor(Math.random() * 252),
+            //     'landuse' + Math.floor(Math.random() * 252),
+            //     'landuse' + Math.floor(Math.random() * 252),
+            //     'landuse' + Math.floor(Math.random() * 252),
+            //     'landuse' + Math.floor(Math.random() * 252),
+            //     'landuse' + Math.floor(Math.random() * 252),
+            // ];
         }
     }
 };
