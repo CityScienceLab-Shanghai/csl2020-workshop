@@ -1,8 +1,10 @@
 <template>
     <div class="incentive-panel">
         <div>
-            <p class="title">Equity without Zoning</p>
-            <p class="description">You can select an <b>incentive policy</b> and run the <b>simulation</b> below.</p>
+            <p class="title">Equity WITHOUT Zoning</p>
+            <p class="description">
+                Please select one of the three <b>incentive policy scenarios</b> and run the <b>simulation</b> below.
+            </p>
         </div>
 
         <b-dropdown id="dropdown-1" 

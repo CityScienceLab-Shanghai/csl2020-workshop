@@ -35,7 +35,7 @@
                         </div>
                     </div>
                 </b-col>
-                <b-col class="panel-col">
+                <b-col cols="3" class="output-col">
                     <OutputPanel :panels="outputPanels" />
                 </b-col>
             </b-row>
@@ -279,6 +279,13 @@ html, body {
     width: 20%;
     min-width: 300px;
     max-width: 350px;
+    height: 100%;
+    overflow-y: auto;
+    padding-bottom: 2em;
+}
+
+.output-col {
+    min-width: 350px;
     height: 100%;
     overflow-y: auto;
     padding-bottom: 2em;

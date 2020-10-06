@@ -82,51 +82,51 @@ export default {
             ],
             charts: []
         },
-        {
-            name: "Calculated incentives",
-            description: "Incentives as calculated by the optimization algorithm. You can switch back to static mode to edit these parameters.",
-            controls: [
-                {
-                    id: "construction_intensity",
-                    name: "Construction intensity",
-                    min: 0, max: 1, default: 1, disabled: true
-                },
-                // {
-                //     id: "rent_discount_ratio_all",
-                //     name: "Overall rent discount",
-                //     min: 0.1, max: 1, default: 1, disabled: true
-                // },
-                {
-                    id: "rent_discount_ratio_low_inc",
-                    name: "Low income",
-                    min: 0.1, max: 1, default: 1, disabled: true
-                },
-                {
-                    id: "rent_discount_ratio_less_commuting",
-                    name: "Less commuting",
-                    min: 0.1, max: 1, default: 1, disabled: true
-                },
-                {
-                    id: "rent_discount_ratio_small_scale",
-                    name: "Small-scale housing",
-                    min: 0.1, max: 1, default: 1, disabled: true
-                }
-            ],
-            charts: []
-        },
+        // {
+        //     name: "Calculated incentives",
+        //     description: "Incentives as calculated by the optimization algorithm. You can switch back to static mode to edit these parameters.",
+        //     controls: [
+        //         {
+        //             id: "construction_intensity",
+        //             name: "Construction intensity",
+        //             min: 0, max: 1, default: 1, disabled: true
+        //         },
+        //         // {
+        //         //     id: "rent_discount_ratio_all",
+        //         //     name: "Overall rent discount",
+        //         //     min: 0.1, max: 1, default: 1, disabled: true
+        //         // },
+        //         {
+        //             id: "rent_discount_ratio_low_inc",
+        //             name: "Low income",
+        //             min: 0.1, max: 1, default: 1, disabled: true
+        //         },
+        //         {
+        //             id: "rent_discount_ratio_less_commuting",
+        //             name: "Less commuting",
+        //             min: 0.1, max: 1, default: 1, disabled: true
+        //         },
+        //         {
+        //             id: "rent_discount_ratio_small_scale",
+        //             name: "Small-scale housing",
+        //             min: 0.1, max: 1, default: 1, disabled: true
+        //         }
+        //     ],
+        //     charts: []
+        // },
     ],
 
     outputPanels: [
         {
-            name: "Overall assessment",
-            description: "Assessment of the diversity, equality, and environment of the neighborhood.",
+            name: "Urban performance",
+            description: "Assessment of the social and environmental urban performance of the community.",
             controls: [],
             charts: [
                 {
                     id: "overall",
                     type: "radar",
                     data: {
-                        labels: ['Affordability', 'Diversity', ['Building', 'Energy', 'Consumption'], ['Commute', 'Energy', 'Consumption']],
+                        labels: ['Affordability', 'Diversity', ['Building', 'Energy', 'Efficiency'], ['Commute', 'Energy', 'Efficiency']],
                         datasets: [
                             { 
                                 label: 'Current', 

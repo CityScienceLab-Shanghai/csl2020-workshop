@@ -29,6 +29,8 @@
 import axios from "axios";
 import PanelPane from './PanelPane.vue';
 
+axios.defaults.withCredentials = true;
+
 export default {
     name: "ControlPanel",
     props: {
