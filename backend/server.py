@@ -56,7 +56,7 @@ def floatAccuracyContorl(matched):
 def getRandomString(length):
     return ''.join(random.sample(string.ascii_letters + string.digits, length))
 
-white = ['http://workshop.citysciencelabshanghai.media', 'https://workshop.citysciencelabshanghai.media']
+white = ['http://workshop.citysciencelabshanghai.media', 'https://workshop.citysciencelabshanghai.media', 'http://localhost:8080']
 
 @app.after_request
 def add_cors_headers(response):
@@ -71,11 +71,13 @@ def add_cors_headers(response):
         response.headers.add('Access-Control-Allow-Headers', 'Cache-Control')
         response.headers.add('Access-Control-Allow-Headers', 'X-Requested-With')
         response.headers.add('Access-Control-Allow-Headers', 'Authorization')
+        response.headers.add('Access-Control-Allow-Headers', 'Set-Cookie')
         response.headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
+        response.headers.add('Set-Cookie', 'cross-site-cookie=bar; SameSite=None')
     return response
 
 
-@app.route('/')
+@app.route('/api/')
 def check():
     return 'OK'
 
@@ -96,7 +98,7 @@ def getSession(session=session):
         p = session.get('sid')
         return f'{p}'
 
-@app.route('/get_session')
+@app.route('/api/get_session')
 def getSession_debug(session=session):
     if haveSession(session):
         print(session.get('sid'))
@@ -108,7 +110,7 @@ def getSession_debug(session=session):
         p = session.get('sid')
         return f'New SSID: {p}'
 
-@app.route('/clear_session')
+@app.route('/api/clear_session')
 def clearSession_debug(session=session):
     if haveSession(session):
         try:
@@ -120,13 +122,13 @@ def clearSession_debug(session=session):
             return f'Session Clear Failed'
     return f'No Session to clear yet'
 
-@app.route('/get_proc')
+@app.route('/api/get_proc')
 def getProc():
     global proc
     resp_dict = {'None':'Running', '0':'Ends Normally', '1':'Sleep', '2':'Process doesnt exsit', '-15':'Kill'}
     return str({k:[v, resp_dict[str(v.poll())]] for k,v in proc.items()})
 
-@app.route('/status')
+@app.route('/api/status')
 def checkStatus():
     global proc
     sid = getSession()
@@ -137,7 +139,7 @@ def checkStatus():
     else:
         return "Terminated"
 
-@app.route('/stop')
+@app.route('/api/stop')
 def kill():
     global proc
     if getSession() in proc.keys():
@@ -149,7 +151,7 @@ def kill():
                 return "Failed"
     return "No Running Process"
 
-@app.route('/start', methods = ['POST', 'GET', 'OPTIONS'])
+@app.route('/api/start', methods = ['POST', 'GET', 'OPTIONS'])
 def RunSim():
     global proc
     sid = getSession()
@@ -164,7 +166,7 @@ def RunSim():
         print(proc[sid].poll())
         return str(proc[sid].poll())
 
-@app.route('/result')
+@app.route('/api/result')
 def getResult():
     if checkStatus() == 'Running':
         return 'GAMA is runninng'
@@ -191,7 +193,7 @@ def getResult():
         Result[getAttrValue(step, 'id')] = step_result
     return jsonify(Result)
 
-@app.route('/debug_result_full')
+@app.route('/api/debug_result_full')
 def getResult_debug_full():
     DOMTree = xml.dom.minidom.parse(f"{ROOT_PATH}/CSS2020/simulation-outputs1.xml")
     collection = DOMTree.documentElement
@@ -215,13 +217,13 @@ def getResult_debug_full():
         Result[getAttrValue(step, 'id')] = step_result
     return jsonify(Result)
 
-@app.route('/debug_start')
+@app.route('/api/debug_start')
 def startSim():
     status, output = subprocess.getstatusoutput(f'bash {ROOT_PATH}/gama-headless.sh {ROOT_PATH}/CSS2020.xml {ROOT_PATH}/CSS2020')
     print(status, output)
     return output
 
-@app.route('/debug_result_part')
+@app.route('/api/debug_result_part')
 def getResult_debug_part():
     DOMTree = xml.dom.minidom.parse(f"{ROOT_PATH}/CSS2020/simulation-outputs1.xml")
     collection = DOMTree.documentElement
@@ -247,5 +249,5 @@ def getResult_debug_part():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug = True)
+    app.run(host='0.0.0.0', debug = True, port=5000)
 
