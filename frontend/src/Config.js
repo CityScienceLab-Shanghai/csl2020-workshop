@@ -7,15 +7,15 @@ function getThemeColor(color, opacity) {
 }
 
 export default {
-    // simulateApi: "http://workshop.citysciencelabshanghai.media/api/start",
-    // statusApi: "http://workshop.citysciencelabshanghai.media/api/status",
-    // resultsApi: "response.json",
-    // stopApi: "http://workshop.citysciencelabshanghai.media/api/stop",
+    simulateApi: "https://workshop.citysciencelabshanghai.media/api/start",
+    statusApi: "https://workshop.citysciencelabshanghai.media/api/status",
+    resultsApi: "response.json",
+    stopApi: "https://workshop.citysciencelabshanghai.media/api/stop",
 
-    simulateApi: "/api/start",
-    statusApi: "/api/status",
-    resultsApi: "/api/result",
-    stopApi: "/api/stop",
+    // simulateApi: "/api/start",
+    // statusApi: "/api/status",
+    // resultsApi: "/api/result",
+    // stopApi: "/api/stop",
     incentiveModes: ['No incentives', 'Static incentives', 'Dynamic incentives'],
     nonePanels: [
         {
@@ -75,14 +75,14 @@ export default {
                     min: 0.62, max: 0.7, default: 0.5, disabled: false
                 },
                 {
-                    id: "normalized_commute_distance_decrease_target",
-                    name: "Commute energy efficiency",
-                    min: 0, max: 0.6, default: 0.5, disabled: false
-                },
-                {
                     id: "normalized_building_energy_target",
                     name: "Building energy efficiency",
                     min: 60, max: 50, default: 0.5, disabled: false
+                },
+                {
+                    id: "normalized_commute_distance_decrease_target",
+                    name: "Commute energy efficiency",
+                    min: 0, max: 0.6, default: 0.5, disabled: false
                 }
             ],
             charts: []
@@ -281,14 +281,14 @@ export default {
                             },
                             { 
                                 label: 'Less commuting', 
-                                key: 'normalized_rent_discount_ratio_small_scale',
+                                key: 'normalized_rent_discount_ratio_less_commuting',
                                 data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                                 fill: false,
                                 borderColor: '#d7a207', borderWidth: 2, pointRadius: 1
                             },
                             { 
                                 label: 'Small-scale housing', 
-                                key: 'normalized_rent_discount_ratio_less_commuting',
+                                key: 'normalized_rent_discount_ratio_small_scale',
                                 data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                                 fill: false,
                                 borderColor: '#7ed321', borderWidth: 2, pointRadius: 1

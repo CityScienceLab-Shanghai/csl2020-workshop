@@ -73,8 +73,8 @@ export default {
                 this.$emit('goal-update', [
                     this.parameters['normalized_low_inc_pop_ratio_target'].map(0, 1, 0, 100),
                     this.parameters['normalized_diversity_target'].map(0, 1, 0, 100),
-                    this.parameters['normalized_commute_distance_decrease_target'].map(0, 1, 0, 100),
                     this.parameters['normalized_building_energy_target'].map(0, 1, 0, 100),
+                    this.parameters['normalized_commute_distance_decrease_target'].map(0, 1, 0, 100),
                 ])
             }
         },
