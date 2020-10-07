@@ -1,33 +1,31 @@
 import string
 
-keys = ['diversity_target', 'low_inc_pop_ratio_target', 'commute_distance_target', 
-'building_energy_target', 'construction_intensity', 'rent_discount_ratio_all', 'rent_discount_ratio_low_inc', 
-'rent_discount_ratio_less_commuting', 'rent_discount_ratio_small_scale', 'incentive_policy', 'dynamic_policy']
+keys = ['normalized_rent_discount_ratio_low_inc', 'normalized_rent_discount_ratio_less_commuting', 'normalized_rent_discount_ratio_small_scale', 
+'normalized_diversity_target', 'normalized_low_inc_pop_ratio_target', 'normalized_commute_distance_decrease_target', 'normalized_building_energy_target', 
+'incentive_policy', 'dynamic_policy']
 
-defaultValue = {key:'0' for key in keys}
+defaultValue = {key:'0' if key not in ['incentive_policy', 'dynamic_policy'] else 'True' for key in keys}
 defaultValue['id'] = '1'
 
 t = string.Template("""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Experiment_plan>
 	<Simulation id="${id}" sourcePath="/home/ubuntu/csl2020-workshop/backend/backend-gama/models/workshop.gaml" finalStep="13" experiment="gui">
 	  <Parameters>
-	  	<Parameter name="construction_intensity" type="FLOAT" value="${construction_intensity}" />
-		<Parameter name="rent_discount_ratio_all" type="FLOAT" value="${rent_discount_ratio_all}" />
-		<Parameter name="rent_discount_ratio_low_inc" type="FLOAT" value="${rent_discount_ratio_low_inc}" />
-		<Parameter name="rent_discount_ratio_less_commuting" type="FLOAT" value="${rent_discount_ratio_less_commuting}" />
-		<Parameter name="rent_discount_ratio_small_scale" type="FLOAT" value="${rent_discount_ratio_small_scale}" />
-		<Parameter name="diversity_target" type="FLOAT" value="${diversity_target}" />
-		<Parameter name="low_inc_pop_ratio_target" type="FLOAT" value="${low_inc_pop_ratio_target}" />
-		<Parameter name="commute_distance_target" type="FLOAT" value="${commute_distance_target}" />
-		<Parameter name="building_energy_target" type="FLOAT" value="${building_energy_target}" />
+		<Parameter name="normalized_rent_discount_ratio_low_inc" type="FLOAT" value="${normalized_rent_discount_ratio_low_inc}" />
+		<Parameter name="normalized_rent_discount_ratio_less_commuting" type="FLOAT" value="${normalized_rent_discount_ratio_less_commuting}" />
+		<Parameter name="normalized_rent_discount_ratio_small_scale" type="FLOAT" value="${normalized_rent_discount_ratio_small_scale}" />
+		<Parameter name="normalized_diversity_target" type="FLOAT" value="${normalized_diversity_target}" />
+		<Parameter name="normalized_low_inc_pop_ratio_target" type="FLOAT" value="${normalized_low_inc_pop_ratio_target}" />
+		<Parameter name="normalized_commute_distance_decrease_target" type="FLOAT" value="${normalized_commute_distance_decrease_target}" />
+		<Parameter name="normalized_building_energy_target" type="FLOAT" value="${normalized_building_energy_target}" />
 		<Parameter name="incentive_policy" type="BOOLEAN" value="${incentive_policy}" />
 		<Parameter name="dynamic_policy" type="BOOLEAN" value="${dynamic_policy}" />
 	  </Parameters>
 	  <Outputs>
-		<Output id="1" name="mean_commute_distance" framerate="1" />
-		<Output id="2" name="kendall_diversity" framerate="1" />
-		<Output id="3" name="kendall_low_inc_ratio" framerate="1" />
-		<Output id="4" name="residence_energy_per_person" framerate="1" />
+		<Output id="1" name="normalized_mean_commute_distance_decrease" framerate="1" />
+		<Output id="2" name="normalized_kendall_diversity" framerate="1" />
+		<Output id="3" name="normalized_kendall_low_inc_ratio" framerate="1" />
+		<Output id="4" name="normalized_residence_energy_per_person" framerate="1" />
 		<Output id="5" name="the_developer.finance" framerate="1" />
 		<Output id="6" name="the_developer.expenditure_total" framerate="1" />
 		<Output id="7" name="the_developer.revene_total" framerate="1" />
@@ -41,6 +39,7 @@ t = string.Template("""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 		<Output id="15" name="Home Loc List" framerate="1" />
 		<Output id="16" name="Population List" framerate="1" />
 		<Output id="17" name="Income List" framerate="1" />
+		<Output id="18" name="grids_with_top6_potential" framerate="1" />
 	  </Outputs>
 	</Simulation>
 </Experiment_plan>""")
