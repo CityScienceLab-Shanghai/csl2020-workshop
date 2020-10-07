@@ -48,7 +48,7 @@ export default {
             return d3.geoMercator()
                 .center([-71.0865450, 42.3672538])
                 .scale(1500000)
-                .translate([this.width / 2 - this.width / 20, this.height / 2]);
+                .translate([this.width / 2 - this.width / 25, this.height / 2]);
         }
     },
     watch: {
@@ -191,9 +191,9 @@ export default {
                 .data(this.dataset)
                 .transition()
                 .delay(() => {
-                    return gaussianRand() * 7000;
+                    return gaussianRand() * 4500;
                 })
-                .duration(2000)
+                .duration(1500)
                 .attr("r", (d) => {
                     return Math.log(d.population * 1.5 + 2 + 1 / Math.E);
                 })
@@ -263,7 +263,7 @@ export default {
                     this.updateAgents();
                 }
             }
-        }, 33);
+        }, 10);
     }
 }
 </script>

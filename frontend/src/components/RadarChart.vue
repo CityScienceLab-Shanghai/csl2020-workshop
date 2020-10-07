@@ -23,6 +23,9 @@ export default {
                         maxTicksLimit: 7,
                         backdropColor: 'black'
                     },
+                    pointLabels: {
+                        fontColor: "#ccc"
+                    }
                 },
                 legend: {
                     labels: {

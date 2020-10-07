@@ -7,15 +7,15 @@ function getThemeColor(color, opacity) {
 }
 
 export default {
-    // simulateApi: "https://workshop.citysciencelabshanghai.media/api/start",
-    // statusApi: "https://workshop.citysciencelabshanghai.media/api/status",
-    // resultsApi: "response.json",
-    // stopApi: "https://workshop.citysciencelabshanghai.media/api/stop",
+    simulateApi: "https://workshop.citysciencelabshanghai.media/api/start",
+    statusApi: "https://workshop.citysciencelabshanghai.media/api/status",
+    resultsApi: "response.json",
+    stopApi: "https://workshop.citysciencelabshanghai.media/api/stop",
 
-    simulateApi: "/api/start",
-    statusApi: "/api/status",
-    resultsApi: "/api/result",
-    stopApi: "/api/stop",
+    // simulateApi: "/api/start",
+    // statusApi: "/api/status",
+    // resultsApi: "/api/result",
+    // stopApi: "/api/stop",
     incentiveModes: ['No incentives', 'Static incentives', 'Dynamic incentives'],
     nonePanels: [
         {
@@ -105,17 +105,17 @@ export default {
                                 label: 'Current', 
                                 data: [0, 0, 0, 0],
                                 borderColor: '#428FFD', borderWidth: 2, pointRadius: 1,
-                                backgroundColor: getThemeColor('blue', 0.5)
+                                backgroundColor: getThemeColor('blue', 0.3)
                             },
                             { 
                                 label: 'Baseline', 
                                 data: [38.3372, 64.3467, 42.9996, 25.6929],
-                                borderColor: '#979797', borderWidth: 2, pointRadius: 1
+                                borderColor: '#707070', borderWidth: 2, pointRadius: 1
                             },
                             { 
                                 label: 'Last', 
                                 data: [0, 0, 0, 0],
-                                borderColor: 'rgba(66,143,253,1)', borderWidth: 2, pointRadius: 1
+                                borderColor: 'rgba(66,143,253,0.6)', borderWidth: 2, pointRadius: 1
                             },
                             { 
                                 label: 'Goal', 
