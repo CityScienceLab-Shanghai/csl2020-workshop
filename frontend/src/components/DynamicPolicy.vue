@@ -2,7 +2,7 @@
     <b-card
     class="mb-2 w-50"
     style="max-width: 400px;"
-    :title="'Dynamic incentives at step ' + (step + 1)">
+    :title="'Dynamic incentives at step ' + step">
         <b-container class="chart">
             <b-row h-align="start">
                 <b-col cols="6">Low income</b-col>

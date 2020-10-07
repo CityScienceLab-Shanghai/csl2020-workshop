@@ -84,25 +84,40 @@ export default {
             console.log("Running simulation");
             console.log(this.parameters);
 
-            axios.post(this.simulateApi, this.parameters, {
+            axios.get(this.statusApi, {
                 jar: cookieJar,
                 withCredentials: true,
-            }).then(() => {
-                this.running = true;
-                this.progress = 0;
-                this.percent = '0%';
-                this.status = 'Simulating...';
-                this.startHeartBeat();
-            }).catch((error) => {
-                console.log(error);
-                axios.post(this.simulateApi, this.parameters).then(() => {
+            }).then((response) => {
+                if (response.data === 'Terminated') {
+                    axios.post(this.simulateApi, this.parameters, {
+                        jar: cookieJar,
+                        withCredentials: true,
+                    }).then(() => {
+                        this.running = true;
+                        this.progress = 0;
+                        this.percent = '0%';
+                        this.status = 'Simulating...';
+                        this.startHeartBeat();
+                    }).catch((error) => {
+                        console.log(error);
+                        axios.post(this.simulateApi, this.parameters).then(() => {
+                            this.running = true;
+                            this.progress = 0;
+                            this.percent = '0%';
+                            this.status = 'Simulating...';
+                            this.startHeartBeat();
+                        })
+                    });
+                } else {
                     this.running = true;
                     this.progress = 0;
                     this.percent = '0%';
                     this.status = 'Simulating...';
                     this.startHeartBeat();
-                })
+                }
             });
+
+            
         },
 
         stopSimulation() {
