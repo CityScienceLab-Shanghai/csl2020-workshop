@@ -7,15 +7,15 @@ function getThemeColor(color, opacity) {
 }
 
 export default {
-    // simulateApi: "http://workshop.citysciencelabshanghai.media/api/start",
-    // statusApi: "http://workshop.citysciencelabshanghai.media/api/status",
-    // resultsApi: "http://workshop.citysciencelabshanghai.media/api/result",
-    // stopApi: "http://workshop.citysciencelabshanghai.media/api/stop",
+    simulateApi: "http://workshop.citysciencelabshanghai.media/api/start",
+    statusApi: "http://workshop.citysciencelabshanghai.media/api/status",
+    resultsApi: "result.json",
+    stopApi: "http://workshop.citysciencelabshanghai.media/api/stop",
 
-    simulateApi: "/api/start",
-    statusApi: "/api/status",
-    resultsApi: "/api/result",
-    stopApi: "/api/stop",
+    // simulateApi: "/api/start",
+    // statusApi: "/api/status",
+    // resultsApi: "/api/result",
+    // stopApi: "/api/stop",
     incentiveModes: ['No incentives', 'Static incentives', 'Dynamic incentives'],
     nonePanels: [
         {
@@ -29,28 +29,28 @@ export default {
             name: "Static incentive strength",
             description: "Manually set incentives for the neighborhood.",
             controls: [
-                {
-                    id: "construction_intensity",
-                    name: "Construction intensity",
-                    min: 0, max: 1, default: 1, disabled: false
-                },
+                // {
+                //     id: "construction_intensity",
+                //     name: "Construction intensity",
+                //     min: 0, max: 1, default: 1, disabled: false
+                // },
                 // {
                 //     id: "rent_discount_ratio_all",
                 //     name: "Overall rent discount",
                 //     min: 0.1, max: 1, default: 1, disabled: false
                 // },
                 {
-                    id: "rent_discount_ratio_low_inc",
+                    id: "normalized_rent_discount_ratio_low_inc",
                     name: "Low income",
                     min: 1, max: 0.5, default: 0, disabled: false
                 },
                 {
-                    id: "rent_discount_ratio_less_commuting",
+                    id: "normalized_rent_discount_ratio_less_commuting",
                     name: "Less commuting",
                     min: 1, max: 0.5, default: 0, disabled: false
                 },
                 {
-                    id: "rent_discount_ratio_small_scale",
+                    id: "normalized_rent_discount_ratio_small_scale",
                     name: "Small-scale housing",
                     min: 1, max: 0.5, default: 0, disabled: false
                 }
@@ -65,22 +65,22 @@ export default {
             description: "Set goals for the equity and environmental impact of the neighborhood, and have the algorithm find optimized dynamic incentives.",
             controls: [
                 {
-                    id: "low_inc_pop_ratio_target",
+                    id: "normalized_low_inc_pop_ratio_target",
                     name: "Affordability",
                     min: 0.35, max: 0.65, default: 0.5, disabled: false
                 },
                 {
-                    id: "diversity_target",
+                    id: "normalized_diversity_target",
                     name: "Diversity",
                     min: 0.62, max: 0.7, default: 0.5, disabled: false
                 },
                 {
-                    id: "commute_distance_target",
+                    id: "normalized_commute_distance_decrease_target",
                     name: "Commute energy efficiency",
                     min: 0, max: 0.6, default: 0.5, disabled: false
                 },
                 {
-                    id: "building_energy_target",
+                    id: "normalized_building_energy_target",
                     name: "Building energy efficiency",
                     min: 60, max: 50, default: 0.5, disabled: false
                 }
@@ -111,6 +111,16 @@ export default {
                                 label: 'Baseline', 
                                 data: [56.7432, 92.30286, 63.56628, 11.51480],
                                 borderColor: '#979797', borderWidth: 2, pointRadius: 1
+                            },
+                            { 
+                                label: 'Last', 
+                                data: [0, 0, 0, 0],
+                                borderColor: 'rgba(66,143,253,0.5)', borderWidth: 2, pointRadius: 1
+                            },
+                            { 
+                                label: 'Goal', 
+                                data: [0, 0, 0, 0],
+                                borderColor: 'rgba(126,211,33)', borderWidth: 2, pointRadius: 1
                             }
                         ]
                     }
@@ -127,7 +137,7 @@ export default {
                     title: "Developer finance",
                     type: "line",
                     data: {
-                        labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+                        labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
                         datasets: [
                             { 
                                 label: 'Finance', 
@@ -167,7 +177,7 @@ export default {
                     indicator: " (Affordability)",
                     type: "line",
                     data: {
-                        labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+                        labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
                         datasets: [
                             { 
                                 label: 'All', 
@@ -199,7 +209,7 @@ export default {
                     indicator: " (Diversity)",
                     type: "line",
                     data: {
-                        labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+                        labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
                         datasets: [
                             { 
                                 label: 'Diversity', 
@@ -217,7 +227,7 @@ export default {
                     indicator: " (Commute energy efficiency)",
                     type: "line",
                     data: {
-                        labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+                        labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
                         datasets: [
                             { 
                                 label: 'Decrease in distance', 
@@ -225,6 +235,14 @@ export default {
                                 data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                                 fill: false,
                                 borderColor: '#428FFD', borderWidth: 2, pointRadius: 1
+                            },
+                            { 
+                                label: 'Danger Zone', 
+                                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                fill: 'start',
+                                backgroundColor: "rgba(255, 0, 0, 0.2)",
+                                borderColor: "rgba(255, 0, 0, 0.5)",
+                                borderWidth: 1, pointRadius: 0
                             }
                         ]
                     }
@@ -235,7 +253,7 @@ export default {
                     indicator: " (Building energy efficiency)",
                     type: "line",
                     data: {
-                        labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+                        labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
                         datasets: [
                             { 
                                 label: 'Residence energy', 
@@ -243,6 +261,37 @@ export default {
                                 data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                                 fill: false,
                                 borderColor: '#428FFD', borderWidth: 2, pointRadius: 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    id: "policies",
+                    title: "Incentive policies",
+                    type: "line",
+                    data: {
+                        labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                        datasets: [
+                            { 
+                                label: 'Low income', 
+                                key: 'normalized_rent_discount_ratio_low_inc',
+                                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                fill: false,
+                                borderColor: '#428FFD', borderWidth: 2, pointRadius: 1
+                            },
+                            { 
+                                label: 'Less commuting', 
+                                key: 'normalized_rent_discount_ratio_small_scale',
+                                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                fill: false,
+                                borderColor: '#d7a207', borderWidth: 2, pointRadius: 1
+                            },
+                            { 
+                                label: 'Small-scale housing', 
+                                key: 'normalized_rent_discount_ratio_less_commuting',
+                                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                fill: false,
+                                borderColor: '#7ed321', borderWidth: 2, pointRadius: 1
                             }
                         ]
                     }

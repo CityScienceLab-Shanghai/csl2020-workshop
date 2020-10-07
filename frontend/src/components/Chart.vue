@@ -26,9 +26,23 @@ export default {
         RadarChart, 
         LineChart
     },
-    data: function () {
+    data () {
         return {
+            lastData: {},
         };
+    },
+    watch: {
+        chartData () {
+            if (this.type === 'radar') {
+                this.chartData.datasets[2].data = this.lastData;
+                this.lastData = [...this.chartData.datasets[0].data];
+            }
+        }
+    },
+    mounted () {
+        if (this.type === 'radar') {
+            this.lastData = [...this.chartData.datasets[0].data];
+        }
     }
 };
 </script>

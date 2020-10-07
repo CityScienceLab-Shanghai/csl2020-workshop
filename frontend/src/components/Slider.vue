@@ -48,7 +48,7 @@ export default {
     },
     computed: {
         mappedValue () {
-            return Number.parseFloat(this.value).map(0, 1, this.min, this.max);
+            return Number.parseFloat(this.value); //.map(0, 1, this.min, this.max);
         }
     },
     watch: {

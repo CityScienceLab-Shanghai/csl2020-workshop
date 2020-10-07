@@ -68,6 +68,15 @@ export default {
             for (var key of Object.keys(data)) {
                 this.parameters[key] = Number(data[key]);
             }
+
+            if (this.incentiveMode === 2) {
+                this.$emit('goal-update', [
+                    this.parameters['normalized_low_inc_pop_ratio_target'].map(0, 1, 0, 100),
+                    this.parameters['normalized_diversity_target'].map(0, 1, 0, 100),
+                    this.parameters['normalized_commute_distance_decrease_target'].map(0, 1, 0, 100),
+                    this.parameters['normalized_building_energy_target'].map(0, 1, 0, 100),
+                ])
+            }
         },
 
         // Send params to GAMA and start simulation
@@ -145,7 +154,6 @@ export default {
 
         // Get simulation results and publish an event to update all data
         getResults() {
-            // axios.get('result.json', {
             axios.get(this.resultsApi, {
                 jar: cookieJar,
                 withCredentials: true,
@@ -172,9 +180,11 @@ export default {
             if (this.incentiveMode === 0) {
                 this.parameters['incentive_policy'] = false;
                 this.parameters['dynamic_policy'] = false;
+                this.$emit('goal-update', [0, 0, 0, 0]);
             } else if (this.incentiveMode === 1) {
                 this.parameters['incentive_policy'] = true;
                 this.parameters['dynamic_policy'] = false;
+                this.$emit('goal-update', [0, 0, 0, 0]);
             } else if (this.incentiveMode === 2) {
                 this.parameters['incentive_policy'] = true;
                 this.parameters['dynamic_policy'] = true;

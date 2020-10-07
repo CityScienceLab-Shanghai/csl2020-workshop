@@ -64,7 +64,7 @@ export default {
     },
     mounted () {
         for (var control of this.controls) {
-            this.parameters[control.id] = control.default.map(0, 1, control.min, control.max);
+            this.parameters[control.id] = control.default; //.map(0, 1, control.min, control.max);
         }
     }
 };

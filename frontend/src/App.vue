@@ -1,5 +1,5 @@
-// TODO: Remove all value mapping, except for radar chart (0...1 => 0...100)
-// TODO: Radar chart add last time history and goals
+// DONE: Remove all value mapping, except for radar chart (0...1 => 0...100)
+// DONE: Radar chart add last time history and goals
 // TODO: Add a line chart showing the change in three policies in dynamic mode
 // TODO: Bind to Can's grid and dynamic policy data
 // TODO: Add favicon
@@ -51,6 +51,7 @@
                         :stopApi="stopApi"
                         :incentive-mode="incentiveMode"
                         @simulation-update="updateSimulationData($event)"
+                        @goal-update="updateGoalData($event)"
                     />
                 </b-col>
                 <b-col>
@@ -95,14 +96,19 @@ Number.prototype.map = function (in_min, in_max, out_min, out_max) {
     return (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-function makeRadarChartData (sourceData) {
+function makeRadarChartData (sourceData, goals) {
     var data = {...Config.outputPanels[0].charts[0].data}
-    data.datasets[0].data = [
-        Number.parseFloat(sourceData[12]['kendall_low_inc_ratio']).map(0.35, 0.65, 0, 100), 
-        Number.parseFloat(sourceData[12]['kendall_diversity']).map(0.62, 0.694, 0, 100), 
-        Number.parseFloat(sourceData[12]['residence_energy_per_person']).map(50, 60, 100, 0),
-        Number.parseFloat(sourceData[12]['commute_distance_decrease']).map(-0.1, 0.6, 0, 100)
-    ];
+    if (sourceData) {
+        data.datasets[0].data = [
+            Number.parseFloat(sourceData[12]['normalized_kendall_low_inc_ratio']).map(0, 1, 0, 100), //.map(0.35, 0.65, 0, 100), 
+            Number.parseFloat(sourceData[12]['normalized_kendall_diversity']).map(0, 1, 0, 100), //.map(0.62, 0.694, 0, 100), 
+            Number.parseFloat(sourceData[12]['normalized_residence_energy_per_person']).map(0, 1, 0, 100), //.map(50, 60, 100, 0),
+            Number.parseFloat(sourceData[12]['normalized_mean_commute_distance_decrease']).map(0, 1, 0, 100), //.map(-0.1, 0.6, 0, 100)
+        ];
+    }
+    if (goals) {
+        data.datasets[3].data = goals;
+    }
     return data;
 }
 
@@ -162,6 +168,10 @@ export default {
         };
     },
     methods: {
+        updateGoalData (data) {
+            this.outputPanels[0].charts[0].data = makeRadarChartData(null, data);
+        },
+
         updateSimulationData (data) {
             this.outputPanels[0].charts[0].data = makeRadarChartData(data);
             var chartData = makeLineChartsData(data);
