@@ -28,21 +28,21 @@ export default {
     },
     data () {
         return {
-            lastData: {},
+            // lastData: {},
         };
     },
     watch: {
-        chartData () {
-            if (this.type === 'radar') {
-                this.chartData.datasets[2].data = this.lastData;
-                this.lastData = [...this.chartData.datasets[0].data];
-            }
-        }
+        // chartData () {
+        //     if (this.type === 'radar') {
+        //         this.chartData.datasets[2].data = this.lastData;
+        //         this.lastData = [...this.chartData.datasets[0].data];
+        //     }
+        // }
     },
     mounted () {
-        if (this.type === 'radar') {
-            this.lastData = [...this.chartData.datasets[0].data];
-        }
+        // if (this.type === 'radar') {
+        //     this.lastData = [...this.chartData.datasets[0].data];
+        // }
     }
 };
 </script>
