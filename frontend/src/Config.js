@@ -7,15 +7,15 @@ function getThemeColor(color, opacity) {
 }
 
 export default {
-    simulateApi: "http://workshop.citysciencelabshanghai.media/api/start",
-    statusApi: "http://workshop.citysciencelabshanghai.media/api/status",
-    resultsApi: "result.json",
-    stopApi: "http://workshop.citysciencelabshanghai.media/api/stop",
+    // simulateApi: "http://workshop.citysciencelabshanghai.media/api/start",
+    // statusApi: "http://workshop.citysciencelabshanghai.media/api/status",
+    // resultsApi: "result.json",
+    // stopApi: "http://workshop.citysciencelabshanghai.media/api/stop",
 
-    // simulateApi: "/api/start",
-    // statusApi: "/api/status",
-    // resultsApi: "/api/result",
-    // stopApi: "/api/stop",
+    simulateApi: "/api/start",
+    statusApi: "/api/status",
+    resultsApi: "/api/result",
+    stopApi: "/api/stop",
     incentiveModes: ['No incentives', 'Static incentives', 'Dynamic incentives'],
     nonePanels: [
         {
