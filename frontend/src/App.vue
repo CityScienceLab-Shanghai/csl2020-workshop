@@ -190,6 +190,8 @@ export default {
             }
             this.updateAgentsData(data);
             this.updateHighlightPoliciesData(data);
+
+            if (!this.animate) this.animate = true;
         },
 
         updateAgentsData (data) {
