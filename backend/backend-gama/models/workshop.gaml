@@ -2483,6 +2483,9 @@ experiment gui type: gui {
 		monitor "normalized_rent_discount_ratio_small_scale" value: normalized_rent_discount_ratio_small_scale;
 		monitor "normalized_rent_discount_ratio_less_commuting" value: normalized_rent_discount_ratio_less_commuting;
 				
+		// DJ visualization
+		monitor "grids_with_top6_potential" value: grids_with_top6_potential;
+
 		// agent info
 		monitor "Name List" value: name_list;
 		monitor "Work Loc List" value: work_loc_list;
