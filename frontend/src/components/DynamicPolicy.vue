@@ -6,23 +6,23 @@
         <b-container class="chart">
             <b-row h-align="start">
                 <b-col cols="6">Low income</b-col>
-                <b-col cols="2" style="text-align: right">{{lowIncome}}</b-col>
-                <b-col cols="4">
-                    <div class="bar" :style="{width: lowIncome + '%'}"></div>
+                <b-col cols="3" style="text-align: right">{{ policy[0].toFixed(2) }}</b-col>
+                <b-col cols="3">
+                    <div class="bar" :style="{width: policy[0] * 100 + '%'}"></div>
                 </b-col>
             </b-row>
             <b-row>
                 <b-col cols="6">Less commuting</b-col>
-                <b-col cols="2" style="text-align: right">{{lessCommuting}}</b-col>
-                <b-col cols="4">
-                    <div class="bar" :style="{width: lessCommuting * 10 + '%'}"></div>
+                <b-col cols="3" style="text-align: right">{{ policy[1].toFixed(2) }}</b-col>
+                <b-col cols="3">
+                    <div class="bar" :style="{width: policy[1] * 100 + '%'}"></div>
                 </b-col>
             </b-row>
             <b-row>
                 <b-col cols="6">Small scale housing</b-col>
-                <b-col cols="2" style="text-align: right">{{smallScaleHousing}}</b-col>
-                <b-col cols="4">
-                    <div class="bar" :style="{width: smallScaleHousing * 10 + '%'}"></div>
+                <b-col cols="3" style="text-align: right">{{ policy[2].toFixed(2) }}</b-col>
+                <b-col cols="3">
+                    <div class="bar" :style="{width: policy[2] * 100 + '%'}"></div>
                 </b-col>
             </b-row>
         </b-container>
@@ -38,17 +38,9 @@ export default {
             type: Number,
             default: 12
         },
-        lowIncome: {
-            type: Number,
-            default: 0
-        },
-        lessCommuting: {
-            type: Number,
-            default: 1
-        },
-        smallScaleHousing: {
-            type: Number,
-            default: 2
+        policy: {
+            type: Array,
+            default: () => [0, 0, 0]
         }
     }
 };

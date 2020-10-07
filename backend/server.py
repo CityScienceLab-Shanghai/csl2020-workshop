@@ -53,6 +53,7 @@ app.config['SECRET_KEY'] = os.urandom(24)
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=2)
 
 pattern_name = re.compile("people[0-9]+")
+pattern_top6 = re.compile("landuse[0-9]+")
 pattern_num = re.compile("[0-9]+\.[0-9]+")
 # app.wsgi_app = WSGICopyBody(app.wsgi_app)
 
@@ -195,7 +196,10 @@ def getResult():
             if 'ame' in getAttrValue(v, 'name'):
                 value = re.sub(pattern_name, stringfy, value)
                 value = value.replace('people', '')
-            if 'List' in getAttrValue(v, 'name'):
+            if 'top6' in getAttrValue(v, 'name'):
+                value = re.sub(pattern_top6, stringfy, value)
+                value = value.replace('landuse', '')
+            if 'List' in getAttrValue(v, 'name') or 'top6' in getAttrValue(v, 'name'):
                 step_result[getAttrValue(v, 'name')] = json.loads(value)
             else:
                 step_result[getAttrValue(v, 'name')] = value
@@ -204,7 +208,10 @@ def getResult():
 
 @app.route('/api/debug_result_full')
 def getResult_debug_full():
-    DOMTree = xml.dom.minidom.parse(f"{ROOT_PATH}/CSS2020/simulation-outputs1.xml")
+    if checkStatus() == 'Running':
+        return 'GAMA is runninng'
+    sid = getSession()
+    DOMTree = xml.dom.minidom.parse(f"{ROOT_PATH}/CSS2020/simulation-outputs{sid}.xml")
     collection = DOMTree.documentElement
     Steps = getXMLNode(collection, 'Step')
     Result = {str(id):{} for id in range(1,13)}
@@ -219,7 +226,10 @@ def getResult_debug_full():
             if 'ame' in getAttrValue(v, 'name'):
                 value = re.sub(pattern_name, stringfy, value)
                 value = value.replace('people', '')
-            if 'List' in getAttrValue(v, 'name'):
+            if 'top6' in getAttrValue(v, 'name'):
+                value = re.sub(pattern_top6, stringfy, value)
+                value = value.replace('landuse', '')
+            if 'List' in getAttrValue(v, 'name') or 'top6' in getAttrValue(v, 'name'):
                 step_result[getAttrValue(v, 'name')] = json.loads(value)
             else:
                 step_result[getAttrValue(v, 'name')] = value
@@ -234,7 +244,10 @@ def startSim():
 
 @app.route('/api/debug_result_part')
 def getResult_debug_part():
-    DOMTree = xml.dom.minidom.parse(f"{ROOT_PATH}/CSS2020/simulation-outputs1.xml")
+    if checkStatus() == 'Running':
+        return 'GAMA is runninng'
+    sid = getSession()
+    DOMTree = xml.dom.minidom.parse(f"{ROOT_PATH}/CSS2020/simulation-outputs{sid}.xml")
     collection = DOMTree.documentElement
     Steps = getXMLNode(collection, 'Step')
     Result = {str(id):{} for id in range(1,13)}
@@ -249,8 +262,11 @@ def getResult_debug_part():
             if 'ame' in getAttrValue(v, 'name'):
                 value = re.sub(pattern_name, stringfy, value)
                 value = value.replace('people', '')
-            if 'List' in getAttrValue(v, 'name'):
-                step_result[getAttrValue(v, 'name')] = json.loads(value)[:5]
+            if 'top6' in getAttrValue(v, 'name'):
+                value = re.sub(pattern_top6, stringfy, value)
+                value = value.replace('landuse', '')
+            if 'List' in getAttrValue(v, 'name') or 'top6' in getAttrValue(v, 'name'):
+                step_result[getAttrValue(v, 'name')] = json.loads(value)[:6]
             else:
                 step_result[getAttrValue(v, 'name')] = value
         Result[getAttrValue(step, 'id')] = step_result

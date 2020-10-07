@@ -9,7 +9,7 @@ function getThemeColor(color, opacity) {
 export default {
     // simulateApi: "http://workshop.citysciencelabshanghai.media/api/start",
     // statusApi: "http://workshop.citysciencelabshanghai.media/api/status",
-    // resultsApi: "result.json",
+    // resultsApi: "response.json",
     // stopApi: "http://workshop.citysciencelabshanghai.media/api/stop",
 
     simulateApi: "/api/start",
@@ -109,13 +109,13 @@ export default {
                             },
                             { 
                                 label: 'Baseline', 
-                                data: [56.7432, 92.30286, 63.56628, 11.51480],
+                                data: [38.3372, 64.3467, 42.9996, 25.6929],
                                 borderColor: '#979797', borderWidth: 2, pointRadius: 1
                             },
                             { 
                                 label: 'Last', 
                                 data: [0, 0, 0, 0],
-                                borderColor: 'rgba(66,143,253,0.5)', borderWidth: 2, pointRadius: 1
+                                borderColor: 'rgba(66,143,253,1)', borderWidth: 2, pointRadius: 1
                             },
                             { 
                                 label: 'Goal', 
@@ -213,7 +213,7 @@ export default {
                         datasets: [
                             { 
                                 label: 'Diversity', 
-                                key: 'kendall_diversity',
+                                key: 'normalized_kendall_diversity',
                                 data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                                 fill: false,
                                 borderColor: '#428FFD', borderWidth: 2, pointRadius: 1

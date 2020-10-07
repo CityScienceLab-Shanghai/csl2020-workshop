@@ -11,7 +11,7 @@
         :sim-data="agentsData"
         :step="currentStep" 
         :animate="animate"
-        :highlights="highlights"
+        :highlights="highlights[currentStep]"
         :map-data="mapData"
         @time-update="updateCurrentTime(Number.parseInt($event))"/>
 
@@ -22,7 +22,7 @@
                 </b-col>
                 <b-col align-self="end">
                     <DynamicPolicy v-if="incentiveMode === 2" class="w-80"
-                    :step="currentStep"/>
+                    :step="currentStep" :policy="policies[currentStep]"/>
                     <div id="slider">
                         <b-input-group :prepend="'Simulation step: ' + currentStep" class="mt-3">
                             <b-form-input type="range" min="0" max="12" value="12" 
@@ -96,44 +96,6 @@ Number.prototype.map = function (in_min, in_max, out_min, out_max) {
     return (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-function makeRadarChartData (sourceData, goals) {
-    var data = {...Config.outputPanels[0].charts[0].data}
-    if (sourceData) {
-        data.datasets[0].data = [
-            Number.parseFloat(sourceData[12]['normalized_kendall_low_inc_ratio']).map(0, 1, 0, 100), //.map(0.35, 0.65, 0, 100), 
-            Number.parseFloat(sourceData[12]['normalized_kendall_diversity']).map(0, 1, 0, 100), //.map(0.62, 0.694, 0, 100), 
-            Number.parseFloat(sourceData[12]['normalized_residence_energy_per_person']).map(0, 1, 0, 100), //.map(50, 60, 100, 0),
-            Number.parseFloat(sourceData[12]['normalized_mean_commute_distance_decrease']).map(0, 1, 0, 100), //.map(-0.1, 0.6, 0, 100)
-        ];
-    }
-    if (goals) {
-        data.datasets[3].data = goals;
-    }
-    return data;
-}
-
-function makeLineChartsData (sourceData) {
-    var chartsData = [];
-    for (var chartId in Config.outputPanels[1].charts) {
-        var data = {...Config.outputPanels[1].charts[chartId].data}
-
-        for (var datasetId in Config.outputPanels[1].charts[chartId].data.datasets) {
-            var datasetKey = Config.outputPanels[1].charts[chartId].data.datasets[datasetId].key;
-            if (!datasetKey) continue;
-            data.datasets[datasetId].data = [];
-            for (var i = 0; i <= 12; i++) {
-                data.datasets[datasetId].data.push(
-                    Number.parseFloat(sourceData[i][datasetKey])
-                );
-            }
-        }
-
-        chartsData.push(data);
-    }
-    console.log(chartsData)
-    return chartsData;
-}
-
 export default {
     name: "App",
     components: {
@@ -160,7 +122,15 @@ export default {
 
             mapData: [],
             agentsData: {},
-            highlights: [],
+            highlights: {
+                0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 
+                7: [], 8: [], 9: [], 10: [], 11: [], 12: []
+            },
+            policies: {
+                0: [0, 0, 0], 1: [0, 0, 0], 2: [0, 0, 0], 3: [0, 0, 0], 4: [0, 0, 0],
+                5: [0, 0, 0], 6: [0, 0, 0], 7: [0, 0, 0], 8: [0, 0, 0], 
+                9: [0, 0, 0], 10: [0, 0, 0], 11: [0, 0, 0], 12: [0, 0, 0]
+            },
 
             currentStep: 12,
             currentTime: '0:00 AM',
@@ -168,17 +138,60 @@ export default {
         };
     },
     methods: {
+
+        makeRadarChartData (sourceData, goals) {
+            var data = {...this.outputPanels[0].charts[0].data}
+            if (sourceData) {
+                data.datasets[2].data = [...data.datasets[0].data];
+                data.datasets[0].data = [
+                    Number.parseFloat(sourceData[12]['normalized_kendall_low_inc_ratio']).map(0, 1, 0, 100), //.map(0.35, 0.65, 0, 100), 
+                    Number.parseFloat(sourceData[12]['normalized_kendall_diversity']).map(0, 1, 0, 100), //.map(0.62, 0.694, 0, 100), 
+                    Number.parseFloat(sourceData[12]['normalized_residence_energy_per_person']).map(0, 1, 0, 100), //.map(50, 60, 100, 0),
+                    Number.parseFloat(sourceData[12]['normalized_mean_commute_distance_decrease']).map(0, 1, 0, 100), //.map(-0.1, 0.6, 0, 100)
+                ];
+            }
+            if (goals) {
+                data.datasets[3].data = goals;
+            }
+            return data;
+        },
+
+        makeLineChartsData (sourceData) {
+            var chartsData = [];
+            for (var chartId in Config.outputPanels[1].charts) {
+                var data = {...Config.outputPanels[1].charts[chartId].data}
+
+                for (var datasetId in Config.outputPanels[1].charts[chartId].data.datasets) {
+                    var datasetKey = Config.outputPanels[1].charts[chartId].data.datasets[datasetId].key;
+                    if (!datasetKey) continue;
+                    data.datasets[datasetId].data = [];
+                    for (var i = 0; i <= 12; i++) {
+                        data.datasets[datasetId].data.push(
+                            Number.parseFloat(sourceData[i][datasetKey])
+                        );
+                    }
+                }
+
+                chartsData.push(data);
+            }
+            console.log(chartsData)
+            return chartsData;
+        },
+
         updateGoalData (data) {
-            this.outputPanels[0].charts[0].data = makeRadarChartData(null, data);
+            this.outputPanels[0].charts[0].data = this.makeRadarChartData(null, data);
         },
 
         updateSimulationData (data) {
-            this.outputPanels[0].charts[0].data = makeRadarChartData(data);
-            var chartData = makeLineChartsData(data);
+            this.outputPanels[0].charts[0].data = this.makeRadarChartData(data);
+            var chartData = this.makeLineChartsData(data);
             for (var chartId in chartData) {
                 this.outputPanels[1].charts[chartId].data = chartData[chartId];
             }
             this.updateAgentsData(data);
+            this.updateHighlightPoliciesData(data);
+
+            if (!this.animate) this.animate = true;
         },
 
         updateAgentsData (data) {
@@ -199,8 +212,18 @@ export default {
                 }
             }
             this.agentsData = parsedData;
+        },
 
-            if (!this.animate) this.animate = true;
+        updateHighlightPoliciesData (data) {
+            for (var step = 0; step < 13; step++) {
+                if (!data[step]) continue;
+                this.highlights[step] = data[step].grids_with_top6_potential.map( name => 'landuse' + name);
+                this.policies[step] = [
+                    Number.parseFloat(data[step].normalized_rent_discount_ratio_low_inc),
+                    Number.parseFloat(data[step].normalized_rent_discount_ratio_less_commuting),
+                    Number.parseFloat(data[step].normalized_rent_discount_ratio_small_scale),
+                ]
+            }
         },
 
         updateCurrentTime(time) {

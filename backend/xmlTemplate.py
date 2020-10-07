@@ -4,7 +4,7 @@ keys = ['normalized_rent_discount_ratio_low_inc', 'normalized_rent_discount_rati
 'normalized_diversity_target', 'normalized_low_inc_pop_ratio_target', 'normalized_commute_distance_decrease_target', 'normalized_building_energy_target', 
 'incentive_policy', 'dynamic_policy']
 
-defaultValue = {key:'0' if key not in ['incentive_policy', 'dynamic_policy'] else 'True' for key in keys}
+defaultValue = {key:'0' if key not in ['incentive_policy', 'dynamic_policy'] else 'false' for key in keys}
 defaultValue['id'] = '1'
 
 t = string.Template("""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -40,6 +40,9 @@ t = string.Template("""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 		<Output id="16" name="Population List" framerate="1" />
 		<Output id="17" name="Income List" framerate="1" />
 		<Output id="18" name="grids_with_top6_potential" framerate="1" />
+		<Output id="19" name="normalized_rent_discount_ratio_low_inc" framerate="1" />
+		<Output id="20" name="normalized_rent_discount_ratio_small_scale" framerate="1" />
+		<Output id="21" name="normalized_rent_discount_ratio_less_commuting" framerate="1" />
 	  </Outputs>
 	</Simulation>
 </Experiment_plan>""")
