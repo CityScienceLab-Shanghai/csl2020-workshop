@@ -109,7 +109,7 @@ export default {
                             },
                             { 
                                 label: 'Baseline', 
-                                data: [56.7432, 92.30286, 63.56628, 11.51480],
+                                data: [38.3372, 64.3467, 42.9996, 25.6929],
                                 borderColor: '#979797', borderWidth: 2, pointRadius: 1
                             },
                             { 
