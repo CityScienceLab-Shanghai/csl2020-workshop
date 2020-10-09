@@ -1,13 +1,22 @@
 import string
 
-keys = ['normalized_rent_discount_ratio_low_inc', 'normalized_rent_discount_ratio_less_commuting', 'normalized_rent_discount_ratio_small_scale', 
-'normalized_diversity_target', 'normalized_low_inc_pop_ratio_target', 'normalized_commute_distance_decrease_target', 'normalized_building_energy_target', 
-'incentive_policy', 'dynamic_policy']
+keys = [
+    "normalized_rent_discount_ratio_low_inc",
+    "normalized_rent_discount_ratio_less_commuting",
+    "normalized_rent_discount_ratio_small_scale",
+    "normalized_diversity_target",
+    "normalized_low_inc_pop_ratio_target",
+    "normalized_commute_distance_decrease_target",
+    "normalized_building_energy_target",
+    "incentive_policy",
+    "dynamic_policy",
+]
 
-defaultValue = {key:'0' if key not in ['incentive_policy', 'dynamic_policy'] else 'false' for key in keys}
-defaultValue['id'] = '1'
+defaultValue = {key: "0" if key not in ["incentive_policy", "dynamic_policy"] else "false" for key in keys}
+defaultValue["id"] = "1"
 
-t = string.Template("""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+t = string.Template(
+    """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Experiment_plan>
 	<Simulation id="${id}" sourcePath="/home/ubuntu/csl2020-workshop/backend/backend-gama/models/workshop.gaml" finalStep="13" experiment="gui">
 	  <Parameters>
@@ -45,7 +54,9 @@ t = string.Template("""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 		<Output id="21" name="normalized_rent_discount_ratio_less_commuting" framerate="1" />
 	  </Outputs>
 	</Simulation>
-</Experiment_plan>""")
+</Experiment_plan>"""
+)
+
 
 def getXML(**newValue):
     tempValue = defaultValue.copy()
@@ -53,6 +64,7 @@ def getXML(**newValue):
         if k in tempValue.keys():
             tempValue[k] = v
     return t.safe_substitute(tempValue)
+
 
 # if __name__ == "__main__":
 #     print(t.safe_substitute(values))
